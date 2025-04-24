@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #box{
+            width: 512px;
+            height: 512px;
+            background-color: antiquewhite;
+            border: 1px solid red;
+            margin: auto;
+        }
+    </style>
+    <script>
+        function pr(){
+
+            let n = parseInt(prompt("과일을 입력하세요. \n1=사과 2=바나나 3=딸기 4=포도 5=복숭아"));
+            let img = document.querySelector("img")
+            let filename;
+            switch (n){
+                case 1 : filename="apple.png"; break;
+                case 2 : filename="banana.png"; break;
+                case 3 : filename="strawberry.png"; break;
+                case 4 : filename="grape.png"; break;
+                case 5 : filename="peach.png"; break;
+                default: alert("잘못된 접근입니다");
+            }
+            filename="../../../images/fruit/"+filename;
+            filename=img.src;
+        }
+    </script>
+</head>
+<body>
+    <button onclick="pr()">버튼을 눌러주세요</button>
+    <div id="box"><img></div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 실제 코드 내용은 body에 주로 작성 -->
+    <!-- Table은 건축하는 느낌으로 만들면 됨 -->
+    <!-- 1. 건물의 외곽 형성 : 높이(height), 너비(width), 외곽의 두께(border)가 필요 <table> -->
+        <table border="2px">
+            <!-- 2. 위아래 벽<tr>, </tr>과, 양옆의 벽<td>, </td> 필요 -->
+            <tr>
+                <td>501</td>
+                <td colspan="2">502</td>
+                
+            </tr>
+            <tr>
+                <td>401</td>
+                <td>402</td>
+                <td>403</td>
+            </tr>
+            <tr>
+                <td colspan="2">301</td>
+                <td>303</td>
+            </tr>
+            <tr>
+                <td>201</td>
+                <td>202</td>
+                <td rowspan="2">203</td>
+            </tr>
+            <!-- 3. 층수를 쌓기 위해서는 <tr>, </tr> 추가 -->
+            <tr>
+                <td>101</td>
+                <td>102</td>
+            </tr>
+            <!-- 4. 옆으로 개수를 늘리기 위해서는 <td>, </td> 추가 -->
+            <!-- 5. 제일 위쪽에 있을수록 고층 -->
+            <!-- 6. 병합 : 행(row), 열(Column) + span 
+                    * 행 병합시에는 위에서 아래로만 합칠 수 있음
+                      ㄱ자 혹은 ㄴ자 형태로 병합은 불가함
+                      엑셀, 워드, 한글 표 병합을 생각하면 됨 
+                      병합하고자 하는 공간을 비워둬야 병합이 되는 구조 -->
+        </table>
+</body>
+</html>
