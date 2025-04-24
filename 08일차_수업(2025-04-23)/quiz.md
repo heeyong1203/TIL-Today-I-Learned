@@ -335,8 +335,6 @@ for( ; i<=5; ){
 ```
 ---
 
-![image](https://github.com/user-attachments/assets/f64b9347-2faa-4573-936e-a091f4061482)
-#### 28번 문제풀이
 
 
 
