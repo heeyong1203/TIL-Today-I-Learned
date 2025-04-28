@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #box{
+            width: 512px;
+            height: 512px;
+            border: 1px solid red;
+            margin: auto;
+            background-color: beige;
+        }
+    </style>
+    <script>
+        
+        function imgFr(){
+            let n = prompt("과일을 선택하세요 \n1.사과 2.바나나 3.포도 4.딸기 5.복숭아");
+
+            n = parseInt(n); //정수로 만들고 싶은 대상 데이터
+            
+            let img = document.querySelector("img");
+
+            if(n==1){
+                img.src="../../../images/fruit/apple.png";
+            }else if(n==2){
+                img.src="../../../images/fruit/banana.png";
+            }else if(n==3){
+                img.src="../../../images/fruit/grape.png";
+            }else if(n==4){
+                img.src="../../../images/fruit/strawberry.png";
+            }else if(n==5){
+                img.src="../../../images/fruit/peach.png";
+            }else {
+                document.write("잘못 선택하셨습니다");
+            }
+        }
+    </script>
+</head>
+<body>
+    <button onclick="imgFr()">버튼을 클릭하세요</button>
+    <div id="box">
+        <img>
+    </div>
+</body>
+</html>
