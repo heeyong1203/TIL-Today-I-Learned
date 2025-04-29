@@ -44,7 +44,7 @@ SIZE 1M;
 CREATE USER java
 IDENTIFIED BY ****
 DEFAULT TABLESPACE myspace
-QUOTA UNLIMITED ON myspace;
+QUOTA UNLIMITED ON myspace; //할당량의 제한이 없음
 
 6. DBeaver 내 Oracle(XE)의 Schemas를 선택 후 F5 누르면 User가 새로 생성된 것을 확인할 수 있음
 Schemas>JAVA
@@ -56,6 +56,7 @@ Schemas>JAVA
 #### 접속 권한 부여
 GRANT CREATE SESSION TO <유저이름>;
 GRANT CREATE SESSION TO JAVA;
+- SESSION : SERVER와 CLIENT 연결되었음을 의미 
 
 ### Oracle sql접속
 1. CMD 실행
