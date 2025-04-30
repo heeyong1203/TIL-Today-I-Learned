@@ -1,0 +1,228 @@
+<!-- 
+aside : 회원정보 입력 박스 4개 / ok버튼
+content : 검색기능 입력 박스 1개 / 입력한 회원정보를 표 형식으로 보여주기
+section :
+
+# select box 생성하여 옵션으로 이름, 사원번호, 급여, 커미션 중 선택 가능하게 하기
+    select box 옆에 검색창을 생성하여 글자를 입력할 수 있게 하기
+    검색창 옆에 검색 버튼을 눌러서 실행할 수 있게 하기
+    검색 실행 시 해당 record가 선택되게 하기
+-->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{margin: 0;}
+        #wrapper{
+            width: 1000px;
+            height: 600px;
+            background-color: yellow;
+            margin: auto;
+        }
+        #aside1{
+            width: 200px;
+            height: 100%;
+            background-color: rgb(29, 253, 22);
+            float: left;
+            text-align: center;
+        }
+        #section{
+            width: 600px;
+            height: 100%;
+            background-color: blue;
+            float: left;
+            
+        }
+        #header{
+            width: 100%;
+            height: 50px;
+            background-color: rgb(26, 224, 19);
+        }
+        #content{
+            width: 100%;
+            height: 550px;
+            background-color: rgb(139, 219, 136);
+        }
+        #aside2{
+            width: 200px;
+            height: 100%;
+            background-color: rgb(18, 141, 14);
+            float: left;
+            text-align: center;
+        }
+        form input{
+            height: 35px;
+            margin: 3px;
+            border: 1px solid #cccccc;
+        }
+        table{
+            /* talbe이 2겹으로 구분되는 것을 무너뜨리는 효과 */
+            border-collapse: collapse;
+        }
+    </style>
+    <script>
+        let memberArr=[]; // 비어있는 1차원 배열 선언
+
+        let content; // 회원 목록이 table 출력될 영역
+        let currentIndex; // 현재 내가 선택한 층
+
+        // 사원 1명에 대한 자세한 정보를 가져와 우측 영역에 출력하자
+        function getDetail(index){
+            // 넘어온 index는 층수이므로, memberArr 배열에 접근할 수 있다.
+            currentIndex=index; // 현재 내가 몇 층을 보고 있는지 다른 함수에서도 알게 하기 위해서, 전역변수로 빼자
+            console.log("EMPNO:", memberArr[index][0]);
+            console.log("ENAME:", memberArr[index][1]);
+            console.log("SAL:", memberArr[index][2]);
+            console.log("COMM:", memberArr[index][3]);
+
+            form2.empno.value=memberArr[index][0];
+            form2.ename.value=memberArr[index][1];
+            form2.sal.value=memberArr[index][2];
+            form2.comm.value=memberArr[index][3];
+        }
+
+        //선택한 층에 사는, 사원의 정보를 변경하여 테이블 갱신까지 처리
+        function edit(){
+            // 현재 2차원 배열인 memberArr의 수정하고 싶은 사원을 접근해보자
+            // 접근하려면 층, 즉 currentIndex가 필요
+            memberArr[currentIndex][0]=form2.empno.value;
+            memberArr[currentIndex][1]=form2.ename.value;
+            memberArr[currentIndex][2]=form2.sal.value;
+            memberArr[currentIndex][3]=form2.comm.value;
+            // 테이블 출력
+            printTable();
+        }
+
+        // 사원 1명 삭제 (이차원 배열의 몇 층을 제거할지를 결정 짓는다.)
+        function del(){
+            memberArr.splice(currentIndex,1)
+            printTable();
+        }
+
+        // 동적으로 테이블을 출력해보자
+        function printTable(){
+            // document.createElement("table"); // <table> DOM
+            let tag="<table border='1px' width='100%'>"
+            tag=tag+"<tr align='center'>"
+                tag=tag+"<td>NO</td>"
+                tag=tag+"<td>EMPNO</td>"
+                tag=tag+"<td>ENAME</td>"
+                tag=tag+"<td>SAL</td>"
+                tag=tag+"<td>COMM</td>"
+            tag=tag+"</tr>"
+            
+            // 실제 데이터가 출력될 tr 영역..
+            for(let i=0;i<memberArr.length;i++){ // 2차원 배열은 층수와 같아, 층 수만큼 반복 시킨다.
+                tag=tag+`<tr align='center' onClick=\"getDetail(${i})\"  onMouseOver=\"this.style.background='yellow'\" onMouseOut=\"this.style.background=''\">` // 쌍따옴표에 이은 홑따옴표도 중복이 되는 경우: escape 문자열 처리!
+                    tag=tag+"<td>"+(i+1)+"</td>"
+                    for(let j=0;j<memberArr[i].length;j++){
+                        tag=tag+"<td>"+memberArr[i][j]+"</td>"
+                    }
+                tag=tag+"</tr>"
+            }
+            // 통계 출력 (td 5개를 통합)
+            tag=tag+"<tr>"
+                    tag=tag+"<td colspan='5' align='right'>사원 수 "+memberArr.length+"명</td>"
+            tag=tag+"</tr>"
+
+            tag=tag+"</table>"
+            content.innerHTML=tag; // 모아진 테그를 한꺼번에 출력하자.
+        }
+        
+        // 메모리 상의 데이터베이스(2차원 배열)에 사원 한 명 등록하기
+        function regist(){
+            // 사원 한 명은 하나의 일차원 배열에 정보들을 담을 수 있으므로, 일차원 배열을 생성하자
+            let member=[];
+            member.push(form1.empno.value); //사원번호의 값을 0번째에 등록
+            member.push(form1.ename.value); //사원명을 0번째에 등록
+            member.push(form1.sal.value); //급여 값을 0번째에 등록
+            member.push(form1.comm.value); //커미션 값을 0번째에 등록
+
+            // 방금 생성된 사원 1명의 정보를 담는 member 배열을, memberArray라는 배열에 추가하자
+            memberArr.push(member);
+            // // 등록이 되었는지 확인을 위하여 생성
+            // alert("회원등록이 완료되었습니다.")
+
+            // 등록 초기화 (기존 입력 데이터를 다시 지운다.)
+            form1.reset();
+        }
+
+        function init(){
+            content=document.getElementById("content");
+        }
+
+        addEventListener("load", function(){
+            init();
+            printTable();
+
+            // 문서 로드 시, 커서를 좌측 입력 최상단에 올려놓아주는 배려...
+            form1.empno.focus();
+
+            // 등록 버튼에 클릭 이벤트 연결
+            let bt_regist=document.querySelector("#aside1 input[type='button']");
+            bt_regist.addEventListener("click", function(){
+                regist(); // 회원등록
+                printTable();
+            });
+
+            form2.bt_edit.addEventListener("click", function(){
+                if(confirm("수정하시겠습니까?")){
+                    if(currentIndex==undefined){
+                        alert("먼저 수정하실 사원을 선택하세요")
+                    }else{
+                        edit();
+                    }
+                }
+            })
+
+            form2.bt_del.addEventListener("click", function(){
+                if(confirm("정말로 삭제하시겠습니까?")){
+                    //사원을 선택한 적이 없는 경우 욕!!
+                    if(currentIndex==undefined){
+                        alert("먼저 삭제하실 사원을 선택하세요")
+                    }else{
+                        del();
+                    }
+                }
+            })
+        })
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="aside1">
+        <!-- 입력 양식 구성 
+            form 태그는 말 그대로 양식이라는 뜻, 즉 제출 양식을 작성하기 위한 태그.
+            눈에 보여지지 않으며 주 용도로 전송 범위 설정이 있음 
+        -->
+            <form name="form1">
+                <input type="text" name="empno" placeholder="사원번호 입력"> <!-- placeholder : 어떤 내용이 임시로 채워져 있는지 -->
+                <input type="text" name="ename" placeholder="사원명 입력"> <!-- name을 쓰는 이유 : server에 데이터를 전송시킬 때 지적할 이름 id가 아니라 name을 사용함 -->
+                <input type="text" name="sal" placeholder="급여 입력">
+                <input type="text" name="comm" placeholder="커미션 입력">
+                <input type="button" value="사원등록">
+            </form>
+        </div>
+        <div id="section">
+            <div id="header"></div>
+            <div id="content"></div>
+        </div>
+        <div id="aside2">
+            <form name="form2">
+                <input type="text" name="empno" placeholder="사원번호 입력"> <!-- name은 id랑 다름 / form의 name이 다르기 때문에 name이 empno로 동일하더라도 구별이 가능함 -->
+                <input type="text" name="ename" placeholder="사원명 입력"> 
+                <input type="text" name="sal" placeholder="급여 입력">
+                <input type="text" name="comm" placeholder="커미션 입력">
+                <input type="button" name="bt_edit" value="사원수정">
+                <input type="button" name="bt_del" value="사원삭제">
+            </form>
+        </div>
+    </div>
+</body>
+</html>
