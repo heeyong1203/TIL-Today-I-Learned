@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{margin: 0px;}
+        #wrapper{
+            width: 100%;
+            height: 450px;
+            overflow: hidden;
+        }
+        #stage{
+            background-image: url(../../front_worspace/html_workspace/images/Mario/bg.png);
+            width: 100%;
+            height: 450px;
+            background-size: 900px 450px;
+            position: relative;
+        }
+    </style>
+    <script>
+        const cloud=1;
+        const brick=2;
+        const randomBox=3;
+        const warpPipe=4; 
+
+        let map = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 2, 3, 2, 0, 0, 0, 2, 3, 2, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ];
+        
+        let stage;
+        let obj;
+        let mario;
+        let backgroundX=0;
+        let objectList = [];
+        let marioY=350;
+        let a=0.05;
+        
+        function createObjects(){
+            for(i=0;i<map.length;i++){
+                for(j=0;j<map[i].length;j++){
+                    let src;
+                    obj = document.createElement("img");
+                    if(map[i][j]!=0){
+                        switch(map[i][j]){
+                            case cloud : src="../../front_worspace/html_workspace/images/Mario/cloud.png"; break;
+                            case brick : src="../../front_worspace/html_workspace/images/Mario/brick.png"; break;
+                            case randomBox : src="../../front_worspace/html_workspace/images/Mario/randomBox.png"; break;
+                            case warpPipe : src="../../front_worspace/html_workspace/images/Mario/warpPipe.png"; break;
+                        }
+                        obj.src=src;
+                        obj.style.width=50+"px";
+                        obj.style.height=50+"px";
+                        obj.style.position="absolute";
+
+                        const originalX = j*50;
+                        const originalY = i*50;
+
+                        obj.style.left=(originalX+backgroundX)+"px";
+                        obj.style.top=originalY+"px";
+
+                        objectList.push({
+                            dom: obj,
+                            originalX: originalX
+                        });
+                        stage.appendChild(obj);
+                    }
+                }
+                
+            }            
+
+        }
+
+        function updateObjects(){
+            for (let obj of objectList){
+                obj.dom.style.left = (obj.originalX + backgroundX) +"px";
+            }
+        }
+
+        function createChar(){
+            mario = document.createElement("img");
+            mario.src="../../front_worspace/html_workspace/images/Mario/mario.png";
+            mario.style.width="40px";
+            mario.style.height="40px";
+            mario.style.left="100px";
+            mario.style.top="350px";
+            mario.style.position="absolute";
+            stage.appendChild(mario);
+
+        }
+        
+        function move(event){
+            let key = event.keyCode;
+            console.log("keyCode=", key);
+
+            switch(key){
+                case 32 : moveJump(); break;
+                case 37 : moveLeft(); break;
+                case 39 : moveRight(); break;
+            }
+
+            function moveJump(){
+                marioY-=45;
+                mario.style.top = marioY+"px";
+                setTimeout(function(){
+                    marioY+=45;
+                    mario.style.top = marioY+"px";
+                }, 300);
+            }
+            function moveLeft(){
+                backgroundX+=5;
+                stage.style.backgroundPositionX = backgroundX+"px";
+                mario.style.transform="scaleX(-1)";
+                updateObjects();
+            }
+            function moveRight(){
+                backgroundX-=5;
+                stage.style.backgroundPositionX = backgroundX+"px";
+                mario.style.transform="scaleX(1)";
+                updateObjects();
+            }
+        }
+
+        function gameLoop(){
+
+        }
+        
+        function init(){
+            stage = document.getElementById("stage");
+            createChar();
+            createObjects();
+            document.addEventListener("keydown", move);
+        }
+        
+        addEventListener("load", function(){
+            init();
+            // setInterval()
+        })
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="stage"></div>
+    </div>
+</body>
+</html>

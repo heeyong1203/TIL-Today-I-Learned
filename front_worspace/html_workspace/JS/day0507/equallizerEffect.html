@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./js/Rect.js"></script>
+    <script>
+        let width=20; // 막대 하나 당 너비
+        let height=250; // 막대 하나 당 높이
+        let count=20; // 막대 수량
+        let a=0.05;
+        let targetH=500;
+        let colorArray=["red", "orange", "yellow", "green", "blue", "navy", "purple"];
+        
+            // 화살표 함수 내에서의 this는 상위 스코프
+            let test=()=>{
+                console.log("나 호출했어?", this)
+            }
+
+        // 원하는 수량의 막대를 만든 후 부모에 부착하되,
+        // 부모의 크기는 결정된 것이 아닌, 자식의 크기 및 수에 비례하여 결정하자 (동적으로 부여)
+        let init = function(){
+            let wrapper = document.createElement("div");
+            wrapper.style.width=width*count+"px";
+            wrapper.style.height=targetH+"px";
+            wrapper.style.margin="auto";
+            wrapper.style.background="black";
+            document.body.appendChild(wrapper);
+            wrapper.style.position="relative";
+            wrapper.style.transform="scaleY(-1)";
+            
+            for(let i=0; i<count; i++){
+                let bg = colorArray[parseInt(Math.random()*colorArray.length)];
+                new Rect(wrapper, i*width, 0, width, height, bg, a, targetH);
+            }
+        }
+        addEventListener("load", function(){
+            init();
+        })
+    </script>
+</head>
+<body>
+</body>
+</html>
