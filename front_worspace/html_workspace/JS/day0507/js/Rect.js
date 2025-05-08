@@ -16,7 +16,7 @@ class Rect{
         this.div.style.left=this.x+"px";
         this.div.style.top=this.y+"px";
         this.div.style.width=this.width+"px";
-        // this.div.style.height=this.height+"px";
+        this.div.style.height=this.height+"px";
         this.div.style.background=this.bg;
     
         this.container.appendChild(this.div); // 부모에 부착
@@ -28,7 +28,8 @@ class Rect{
         console.log("move()...");
         // 여기서 막대의 크기를 감속도 공식을 적용하여 움직여보자
         // 높이 = 초기높이 + 계수 * (목표높이-초기높이)
-        this.div.style.height = parseFloat((this.height)) + this.a*(parseFloat(this.targetH-this.height))+"px"
+        this.height = parseInt((this.height)) + this.a*(parseInt(this.targetH-this.height))+"px"
+        
         setTimeout(()=>{
             this.move();
         }, 10);
