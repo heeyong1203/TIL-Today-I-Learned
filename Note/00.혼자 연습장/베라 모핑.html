@@ -95,10 +95,30 @@
             wrapper.appendChild(iceCream);
         }
 
-        function move(){ // 아이스크림 맛 설명 표기
-            p.style.top = 0+"px";
-            p.style.fontSize = 32+"px";
+        function move(){ // 설명 움직임
+            // 위치 = 현 위치 + a*(목표-현위치);
+            let a=0.05;
+            p.style.top = parseFloat(p.style.top) + a*(0-parseFloat(p.style.top))+"px";
+            p.style.fontSize = parseFloat(p.style.fontSize) + a*(32-parseFloat(p.style.fontSize))+"px";
             p.style.fontWeight = "bold";
+            setTimeout(move,10);
+            
+            function textMove(){
+                let flag = true;
+                let targetX=-200;
+                if(flag){
+                    p.style.left = parseFloat(p.style.left) + a*(targetX-parseFloat(p.style.left))+"px";
+                    flag=!flag;
+                }else{
+                    p.style.left=targetX+"px";
+                    flag=!flag;
+                }
+                setTimeout(textMove,10);
+            }
+
+        }
+        
+        function change(){ // 아이스크림 맛 설명 표기
             p.innerText=pArray[n];
             p.style.color="white";
             wrapper.style.background = bgArray[n];
@@ -114,8 +134,11 @@
                 let p1 = document.querySelector("#wrapper p:first-child");
                 p1.remove();
             }, 3000)
-            setInterval(function(){
+            setTimeout(function(){
                 move();
+            }, 3000)
+            setInterval(function(){
+                change();
             }, 3000);
         })
     </script>
