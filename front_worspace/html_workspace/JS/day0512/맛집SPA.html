@@ -22,6 +22,13 @@
         #aside_regist *{
             width: 85%;
         }
+        #preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 5px;
+            border: 2px solid red;
+
+        }
         #content{
             width: 1000px;
             height: 100%;
@@ -65,6 +72,7 @@
         // var x=7;
         var storeList=[]; // 등록한 상점들을 모아 둘 일차원 배열
         let map;
+        let profileData; // <img src>에 넣을 바이너리를 문자열화 시킨 데이터
 
         // body 최하단의 구글 스크립트에 의해, 구글 맵이 로드가 완료되는 시점에
         // 개발자가 미리 정의해놓은 함수를 호출해 줌 (callBack 방식)
@@ -84,10 +92,8 @@
                 store_name:document.getElementById("store_name").value,
                 tel:document.getElementById("tel").value,
                 pos:document.getElementById("pos").value,
-                icon:{
-                    url:"../../images/map/image3.png",
-                    scaledSize:new google.maps.Size(45,45)
-                }
+                profileImg:profileData,
+                iconImg:document.getElementById("icon").value
             };
             // 하나의 상점을 배열에 담기
             storeList.push(store);
@@ -102,51 +108,147 @@
             // 사실 내부적으로는 엄연한 객체
             // 37.509515, 127.055526 형태의 문자열을 대상으로 쉼표(,)를 기준으로 분리시키자
             // 그리고 그 결과를 배열로 반환받자
-            console.log(store.pos);
+            // console.log(store.pos);
             let latiLongi=store.pos.split(",");
             console.log(latiLongi);
 
             let pos=new google.maps.LatLng(parseFloat(latiLongi[0]), parseFloat((latiLongi[1])))
             let marker = new google.maps.Marker({
                 position: pos,
-                icon:store.icon,
-                animation:google.maps.Animation.DROP
+                animation:google.maps.Animation.BOUNCE,
+                icon:{
+                    url:document.getElementById("icon").value,
+                    scaledSize:new google.maps.Size(45,45)
+                }
             });
             
             // 생성된 마커를 어느 맵 객체에 적용할지 결정
             marker.setMap(map);
+
+            
+            // 마커 이벤트
+            google.maps.event.addListener(marker,'click',function() {
+                // 새창 띄우기
+                let infowindow = new google.maps.InfoWindow({
+                    content:"여기 맛집임!"
+                });
+                infowindow.open(map,marker);
+
+                map.setZoom(18);
+                map.setCenter(marker.getPosition());
+            });
         }
 
+        // 
+        function registAll(obj){
+            console.log("넘겨받은 데이터 객체는 ", obj);
+
+            // 지도에 마커 출력
+            for(let i=0; i<obj.storeList.length; i++){
+                let store=obj.storeList[i];// 한 상점씩 꺼내자
+
+                let latiLongi=store.pos.split(",");
+                console.log(latiLongi);
+
+                let pos=new google.maps.LatLng(parseFloat(latiLongi[0]), parseFloat((latiLongi[1])))
+                let marker = new google.maps.Marker({
+                    position: pos,
+                    animation:google.maps.Animation.BOUNCE,
+                    icon:{
+                        url:store.iconImg,
+                        scaledSize:new google.maps.Size(45,45)
+                    }
+                });
+                
+                // 생성된 마커를 어느 맵 객체에 적용할지 결정
+                marker.setMap(map);
+                
+                
+                // 마커 이벤트
+                google.maps.event.addListener(marker,'click',function() {
+                    // 새창 띄우기
+                    let infowindow = new google.maps.InfoWindow({
+                        content:store.store_name
+                    });
+                    infowindow.open(map,marker);
+                    
+                    map.setZoom(18);
+                    map.setCenter(marker.getPosition());
+                });
+            }
+        }
+
+        
         // 지금까지 누적된 가게 정보들의 목록을 새 창으로 보여주기
         function getList(){
             window.open("list.html", "_blank", "width=1000px, height=800px"); //_blank: 새창으로 띄워라
         }
 
+        // 대표사진 미리보기
+        function previewImg(e){
+            // js는 사용자의 하드디스크 접근 가능? no...
+            // js는 사용자의 pc에 접근할 수 없다. (보안상) 하지만 만일 <input type=file> 컴포넌트에 의해
+            // 사용자가 파일을 선택하게 되면, 해당 파일에 대해서만 접근을 수락한 것으로 보고, 제어가 가능해짐
+            // 이 때 브라우저가 읽어들인 파일을 제어할 수 있도록 제공되는 객체 : FileReader이다.
+            // 참고) FileReader는 JS표준은 아니지만, 너무나 많이 쓰기 때문에 필수 객체가 되어버림
+            //      따라서, 거의 대부분의 브라우저가 지원함
+            let reader = new FileReader();
+            // 모든 파일은 사람이 읽을 수 있는지의 여부를 기준으로 할 때, 단 두 가지로 분류함
+            // 문서파일(인간이 육안으로 읽을 수 있는 파일), 바이너리 파일(인간이 육안으로 해석할 수 없는 파일)
+            // 문서파일의 예) 메모장(.txt), 자바(.java), csv...
+            // 바이너리 파일의 예) 이미지, 동영상, psd, excel, class...
+            
+            // 브라우저가 다 읽으면, 우측에 정의한 함수를 호출해줌(콜백)
+            reader.onload=function(data){ // 매개변수로 읽어들인 결과를 준다.
+                console.log(data.target.result);
+                // 크롬 브라우저가 이미지 바이너리를 문자열화 시켜놓은 결과물(개발자 배려)을 img.src에 대입하면 됨
+                document.getElementById("preview").src=data.target.result;
+                profileData=data.target.result;
+            }
+            reader.readAsDataURL(e.target.files[0]); // 파일 읽기
+            // console.log(e);
+        }
+        
+        // 일괄 등록용 새창을 띄워서 메모장을 선택하게 한 후, 적용을 누르면 지도에 마커와 정보가 출력...
+        function batchRegist(){
+            let url="regist.html";
+            let name="pop";
+            let options="width=500px, height=500px";
+
+            window.open(url, name, options);
+        }
+
         addEventListener("load", function(){
+            // 대표사진 선택 했을 때..
+            document.getElementById("profile").addEventListener("change", function(e){
+                previewImg(e);
+            })
+
             document.querySelector("#aside_regist :nth-child(7)").addEventListener("click", function(){
                 regist()});
+            
+            document.querySelector("#aside_regist :nth-child(8)").addEventListener("click", function(){
+                batchRegist()});
 
             document.querySelector("#aside_regist :nth-child(9)").addEventListener("click", function(){
-                getList()});
-                
+                getList()});                
         })
     </script>
 </head>
 <body>
     <div id="wrapper">
         <div id="aside_regist">
-마커에 메모표시
             <input type="text" placeholder="상호명" id="store_name">
             <input type="text" placeholder="연락처" id="tel">
             <input type="text" placeholder="위도, 경도" id="pos"> <!--숫자를 입력해도 문자 취급-->
             <input type="file" id="profile"> <!-- 음식 사진 -->
-            <div id="preview">사진 미리보기 영역</div>
+            <img id="preview">
             <select name="" id="icon">
-                <option value="">스마일</option>
-                <option value="">핀</option>
-                <option value="">이미지3</option>
-                <option value="">이미지4</option>
-                <option value="">이미지5</option>
+                <option value="../../images/map/smile.png">스마일</option>
+                <option value="../../images/map/pin.png">핀</option>
+                <option value="../../images/map/image3.png">이미지3</option>
+                <option value="../../images/map/image4.png">이미지4</option>
+                <option value="../../images/map/image5.png">이미지5</option>
             </select>
             <button>등록</button>
             <button>일괄등록</button>
@@ -159,6 +261,6 @@
     <!-- 모든 요소가 적용된 후에 map api를 적용하겠다! -->
     <!-- 아래 주소에 생성된 key를 your key 대신 적용 -->
     <!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY&callback=myMap"></script> -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAXf6zKRcYJkBVKNlA_e3erUOIz81dmORU&callback=initMap"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBI0h_xSHoIzCGO-vFEMXxZc3jG_xyVBYs&callback=initMap"></script>
 </body>
 </html>
