@@ -28,7 +28,7 @@ HR
 CONN JAVA/1234
 Connected.
 SQL> -- ERD를 참고하여 테이블 생성하기
-SQL> -- E(Entiry)R(Relation)D(Diagram)=개체관계도
+SQL> -- E(Entity)R(Relation)D(Diagram)=개체관계도
 SQL> SELECT TABLE_NAME FROM USER_TABLES;
 
 TABLE_NAME                                                                      

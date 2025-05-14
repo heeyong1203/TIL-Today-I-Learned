@@ -41,8 +41,32 @@ function convertDay(n, lang){
    해당 월의 마지막 일 구하기
    API 사용 예) 2025년 5월 구하기 : getLastDate(원하는 연도, 원하는 달);
    *------------------------------------------------------------*/
-   function getLastDate(yy,mm){
-      let d = new Date(yy, mm+1, 0); // yy년도 mm월 1일
-      return d.getDate(); // 요일을 반환
-      
+  function getLastDate(yy,mm){
+     let d = new Date(yy, mm+1, 0); // yy년도 mm월 1일
+     return d.getDate(); // 요일을 반환
+     
    }
+   
+   /*------------------------------------------------------------- 
+   충돌체크 함수;
+   API 사용 예) 
+   *------------------------------------------------------------*/
+   function collisionCheck(me, target){
+   // 나에 대한 수치계산
+   const me_x = parseInt(me.style.left);
+   const me_y = parseInt(me.style.top);
+   const me_width= parseInt(me.style.width);
+   const me_height= parseInt(me.style.height);
+
+   const target_x = parseInt(target.style.left);
+   const target_y = parseInt(target.style.top);
+   const target_width= parseInt(target.style.width);
+   const target_height= parseInt(target.style.height);
+
+   return !(
+      me_x+me_width < target_x || // me의 우측면이 target의 좌측면에 도달하지 못했거나
+      me_x > target_x+target_width || // me의 좌측면이 target의 우측면을 넘어섰을 경우
+      me_y+me+me_height < target_y || // me의 하단면이 target의 상단면에 도달하지 못했거나
+      me_y > target_y + target_height // me의 상단면이 target의 하단면을 넘어섰을 경우
+   )
+  }
