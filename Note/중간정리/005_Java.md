@@ -209,3 +209,53 @@ class UseRose{
 }
 ```
 
+### 📘 클래스 상속 (Class Inheritance)
+- 여러 클래스에서 동일한 멤버 변수나 멤버 메서드가 반복된다면, 코드의 중복과 비효율이 발생함
+
+- 이를 해결하기 위해, 공통되는 멤버를 하나의 **부모 클래스(parent)** 에 정의하고,
+다른 클래스들이 이를 `상속(inherit)` 받아 재사용할 수 있도록 함
+
+- 상속을 통해 코드 재사용성이 증가하고, 유지보수가 쉬워짐
+
+- `extends` 키워드를 사용하면, 부모 클래스가 가진 **멤버 변수**와 **멤버 메서드**가 자식 클래스에 상속됨
+
+- GUI : parent(부모) ↔ child(자식)
+- js : super(부모) ↔ sub(자식)
+
+```java
+예시)
+// 부모 클래스
+package human;
+
+public class Human{
+    String skinColor;
+    int leg=2;
+
+    public void intellecThink(){
+        System.out.println("지적인 사고력");
+    }
+}
+
+// 자식 클래스
+package human;
+
+public class Asian extends Human{
+    public void studyWell{
+        System.out.println("공부를 잘해요");
+    }
+}
+
+// 실행부 보유 클래스
+package use;
+import human.Asian;
+
+class UseHuman{
+    public static void main(String[] args){
+        Asian a = new Asian();
+        a.intellecThink();
+        // Asian 클래스에는 intellecThink() 메서드가 없음
+        // 하지만, Human 클래스의 멤버 변수와 멤버 메서드를 상속 받았기 때문에
+        // UseHuman은 intellecThink()메서드를 호출할 수 있음
+    }
+}
+```
