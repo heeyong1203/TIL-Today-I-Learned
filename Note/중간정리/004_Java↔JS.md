@@ -72,3 +72,9 @@ memberList.push(member2);
 |Adams|30|man|
 |Scott|31|man|
     
+
+### 화살표 함수, 이벤트 객체
+### 은닉화(getter, setter)
+### 메모장 파일을 Javascript에서는 웹브라우저의 능력으로 불러왔었음 fileReader...
+### java는 메모장 파일을 직접 불러올 수 있음 (FileInputStream)
+### 예외처리가 필요 - 예외처리란?
