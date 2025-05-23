@@ -31,7 +31,6 @@ public class OracleTest {
 			System.out.println("드라이버 로드 실패");
 			e.printStackTrace();
 		} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 	}
