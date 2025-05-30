@@ -74,7 +74,7 @@ function convertDay(n, lang){
    return !(
       me_x+me_width < target_x || // me의 우측면이 target의 좌측면에 도달하지 못했거나
       me_x > target_x+target_width || // me의 좌측면이 target의 우측면을 넘어섰을 경우
-      me_y+me+me_height < target_y || // me의 하단면이 target의 상단면에 도달하지 못했거나
+      me_y+me_height < target_y || // me의 하단면이 target의 상단면에 도달하지 못했거나
       me_y > target_y + target_height // me의 상단면이 target의 하단면을 넘어섰을 경우
    )
   }
