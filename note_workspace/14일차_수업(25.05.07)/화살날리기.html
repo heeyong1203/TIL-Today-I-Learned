@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script>
+    let arrowList=[];
+    
+    class Arrow{
+        constructor(x, y, velX, color){
+            this.span;
+            this.x=x;
+            this.y=y;
+            this.velX=velX;
+
+            this.span = document.createElement("span");
+            this.span.innerText="→";
+            this.span.style.position="absolute";
+            this.span.style.fontSize=40+"px";
+            this.span.style.left=this.x+"px";
+            this.span.style.top=this.y+"px";
+            this.span.style.color=color;
+            document.body.appendChild(this.span);
+
+        }
+        
+        move(){
+            this.x=this.x+this.velX;
+            this.span.style.left=this.x+"px";
+        }
+    }
+    
+    function gameLoop(x, y, velX, color){
+        for(let i=0;i<arrowList.length;i++){
+            arrowList[i].move();
+        }
+        console.log("gameLoop called...")
+    }
+
+
+    // 화살표 생성
+    addEventListener("load", function(){
+        arrowList.push(new Arrow(200, 100, 5, "red"));
+        arrowList.push(new Arrow(300, 200, 2, "blue"));
+        arrowList.push(new Arrow(0, 300, 7, "green"));
+        setInterval(gameLoop, 10);
+    })
+</script>
+<body>
+    
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #box{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: red;
+            position: absolute;
+            left: 0px;
+            top: 150px;
+        }
+    </style>
+    <script>
+        // 문서 내의 빨간 원의 css 중 position-left값을 증가 시킨다.
+        
+        let x = 0;
+        let flag = true;
+        
+        function move(){
+            let box = document.getElementById("box");
+            box.style.position="absolute"
+            box.style.left =`${0}px`
+            box.style.top=`${150}px`
+            
+            
+            // 1) x=0일 때 
+                // 조건식은 x += 3;
+                // x= 300에 도달하면 flag=false
+            // 2) x=300일 떄
+                // 조건식은 x -= 3; 
+                // x=0에 도달하면 flag=true
+            
+                if(flag){
+                    x += 3 ;
+                    box.style.left = x+"px";
+
+                    if(x == 300){
+                        flag=false
+                    }
+                }else{
+                    x -= 3 ; 
+                    box.style.left = x+"px";
+
+                    if(x === 0){
+                        flag=true;
+                    }
+                }
+            
+                
+        }
+
+        function init(){
+            addEventListener("load", function(){
+               let m = document.getElementById("manual");
+               let a = document.getElementById("auto");
+               
+               m.addEventListener("click", function(){
+                    move();
+               })
+
+               a.addEventListener("click", function(){
+                    move();
+                    setInterval("move()", 10);
+                    this.disabled=true;
+               })
+            })
+        }
+
+        init();
+    </script>
+</head>
+<body>
+    <input type="button" value="수동" id="manual">
+    <input type="button" value="자동" id="auto">
+    
+    <div id="box"></div>
+</body>
+</html>

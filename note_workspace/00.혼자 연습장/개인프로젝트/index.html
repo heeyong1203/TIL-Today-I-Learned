@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>배스킨라빈스</title>
+    <style>
+        body{margin: 0px;}
+        * {
+            user-select: none;
+        }
+        #wrapper{
+            float: left;
+            background-color: rgba(146,86,74,255);
+            width: 19200px;
+            height: 957px;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+    </style>
+    <script src="./js/iceCreamData.js"></script>
+    <script src="./js/GameObject.js"></script>
+    <script src="./js/Corn.js"></script>
+    <script src="./js/Words.js"></script>
+    <script src="./js/IceCream.js"></script>
+    
+    <script>
+        // 전역 변수 설정
+        let wrapper; // 배경 div
+        let wrapperWidth; // 배경 너비
+        let wrapperHeight; // 배경 높이
+        let cornSize; // 콘 사이즈
+        let iceCreamSize; // 아이스크림 사이즈
+
+        let startX; // 첫 화면 아이스크림 위치 
+        let iceCreams = []; // 생성된 아이스크림들을 담아둘 배열
+        let words = []; // 생성된 글자들을 담아둘 배열
+
+        let isStopped = false; // 아이스크림이 멈춤 상태 확인을 위한 논리값 변수
+        let activeIndex = -1; // 콘에 도달한 아이스크림(글자) 인덱스 변수
+
+        let st; // setTimeout 상태를 담아둘 전역변수 (default값 = null)
+
+        let isDragging = false; // 드래그를 하고 있는지 상태를 확인하는 변수
+        let dragStartX; // 드래그로 아이스크림을 이동시키기 위해 드래그 시작 시 위치 값을 담을 변수
+        /*------------------------------------------------------------------------------*/
+
+        // 콘에서 가장 가까운 아이스크림이 자동으로 콘에 달라붙음
+        function autoAlign(){
+            let minDistance = Infinity;
+            let index=-1;
+
+            for(let i=0; i<iceCreams.length; i++){
+                let distance = Math.abs(iceCreams[i].x-startX);
+                if(distance<minDistance){
+                    minDistance = distance;
+                    index = i; // 가장 가까운 아이스크림의 인덱스 저장
+                }
+            }
+            if(index != -1){ // 가까운 아이스크림이 존재하는 경우에만 실행
+                let deltaX = startX-iceCreams[index].x; // 움직일 변위값
+                for(let i=0; i<iceCreams.length; i++){ 
+                    iceCreams[i].x+=deltaX; // 변위값만큼 모든 아이스크림 이동
+                    iceCreams[i].render();
+                }
+            }
+        }
+
+        // 아이스크림 움직임 여부 확인
+        function moveCheck(){
+            for(let i=0; i<iceCreams.length; i++){
+                if(!iceCreams[i].stopped){ // 아이스크림이 이동 중이라면
+                    iceCreams[i].tick(); // 아이스크림 위치값 지속적 갱신
+                }
+            }
+        }
+
+        // 아이스크림 멈춤
+        function stop(){
+            for(let j=0; j<iceCreams.length;j++){
+                iceCreams[j].stopped=true; // 아이스크림 움직임 비활성화
+                iceCreams[j].tick(); // 아이스크림 위치 갱신
+            }
+            isStopped=true; // 아이스크림 움직임 비활성화에 따른 상태 확인값 변화
+        }
+
+        // 아이스크림 다시 움직임
+        function reStart(){
+            if(activeIndex!==-1){
+                words[activeIndex].isActive=false; // 글씨 움직임 비활성화
+            }
+
+            for(let i=0; i<iceCreams.length; i++){
+                iceCreams[i].stopped=false; // 아이스크림 움직임 활성화
+                iceCreams[i].tick();  // 아이스크림 위치 갱신
+            }
+            isStopped=false; // 아이스크림 움직임 활성화되었으므로, false로 변경
+            activeIndex=-1; // 아이스크림 콘 위에 없으므로, 활성화인덱스 제거
+        }
+
+        // 콘에 아이스크림 도착 여부 확인
+        function arriveToCorn(){
+            if(isStopped) return;
+            for(let i=0; i<iceCreams.length;i++){
+                // 아이스크림의 x값이 콘 내부 일정 영역에 도달한다면...
+                if(Math.abs(iceCreams[i].x - startX)<=iceCreamSize/240){
+                    activeIndex=i; // 멈춘 아이스크림 객체의 인덱스 저장
+                    stop(); // 아이스크림 멈춤
+                    words[activeIndex].isActive=true; // 해당 인덱스의 글자 활성화
+
+                    // setTimeout 중복 방지
+                    if(st!==null) clearTimeout(st);
+
+                    st = setTimeout(() => {
+                        reStart();
+                        st=null;    
+                    }, 3000);
+                    break;
+                }
+            }
+        }
+        
+        // 아이스크림 배열 재정렬
+        function resetIce(){
+            for(let i=0; i<iceCreams.length; i++){
+                if(iceCreams[i].x<=startX-4*wrapperWidth){
+                    iceCreams[i].x += 10*wrapperWidth;
+                }
+            }
+        }
+
+        // 아이스크림 및 글자 렌더링
+        function renderObject(){
+            for (let i=0; i<iceCreams.length; i++){
+                words[i].tick(); // 글자 움직임은 매번 갱신할 필요 없으므로, render 직전에 한 번만
+                iceCreams[i].render();
+                words[i].render();
+            }
+        }
+
+        // 마우스 이벤트 없을 때의 움직임
+        function move(){
+            arriveToCorn(); // stop + reStart
+            moveCheck();
+            resetIce();
+            renderObject();
+        }
+        
+        // 초기화
+        function init(){
+            wrapper = document.getElementById("wrapper");
+            setWrapperSize();
+             
+            // 콘 객체 생성
+            let corn = new Corn(wrapper, (wrapperWidth-cornSize)/2,  wrapperHeight*0.5, cornSize, cornSize, "https://img.pikbest.com/origin/09/29/55/97KpIkbEsTiqn.png!sw800");
+            
+            // 아이스크림 및 텍스트 객체 생성
+            for (let i = 0 ; i < iceCreamData.length ; i++) {
+                let config = iceCreamData[i]; // iceCreamData에서 필요한 정보 가져오기
+                
+                // words 객체 생성
+                let word = new Words(wrapper, 0, wrapperHeight*0.5, wrapperWidth, 0, {
+                    text: config.name,
+                    textColor: config.textColor,
+                    originalFontSize: wrapperHeight*0.005,
+                    targetFontSize: wrapperHeight*0.09,
+                    bgColor: config.bgColor,
+                    targetY: wrapperHeight*0.075
+                });
+
+                // IceCream 객체 생성
+                let iceCream = new IceCream(wrapper, startX + (i-5)*wrapperWidth,  0.05*wrapperHeight, iceCreamSize, iceCreamSize, {
+                    velX: -iceCreamSize/120,
+                    imageUrl: config.imageUrl
+                });
+
+                iceCreams.push(iceCream);
+                words.push(word);
+            }
+        }
+        
+        // 드래그 이벤트 함수
+        function Drag(){
+            wrapper.addEventListener("mousedown", (e)=>{
+                isDragging=true;
+                dragStartX=e.clientX;
+                stop(); // 클릭 중엔 움직임 멈춤
+            });
+
+            wrapper.addEventListener("mousemove", (e)=>{
+                if(!isDragging) return;
+                let currentX = e.clientX-dragStartX;
+                dragStartX=e.clientX; // 기준 위치 갱신
+
+                for(let i=0; i<iceCreams.length; i++){
+                    iceCreams[i].x += currentX;
+                    iceCreams[i].render(); 
+                }
+            });
+
+            wrapper.addEventListener("mouseup", ()=>{
+                isDragging=false;
+                autoAlign();
+                arriveToCorn();
+            });
+
+            // 마우스를 밖으로 가지고 나갈 경우를 대비
+            wrapper.addEventListener("mouseleave", ()=>{
+                if(!isDragging) return;
+                isDragging=false;
+                autoAlign();
+                arriveToCorn();
+            });
+        }
+
+        // 더블클릭 이벤트 함수
+        function doubleClick(){
+            for(let i=0; i<iceCreams.length; i++){
+                iceCreams.addEventListener("dblclick", ()=>{
+                    // 아이스크림 객체 선택 시 해당 정보 홈페이지로 이동
+                });
+            }
+        }
+
+        // 로드 이벤트
+        window.addEventListener("load", function(){
+            init();
+            setInterval(move, iceCreamSize/120);
+            Drag();
+            // doubleClick();
+        });
+
+         // 화면 재조정
+        function setWrapperSize(){
+            wrapperWidth = window.innerWidth;
+            wrapperHeight = window.innerHeight;
+            
+            wrapper.style.width=wrapperWidth+"px";
+            wrapper.style.height=wrapperHeight+"px";
+
+            cornSize = wrapperHeight;
+            iceCreamSize = wrapperHeight*0.95;
+            startX = (wrapperWidth-iceCreamSize)/2;
+            }
+        window.addEventListener("resize", ()=>{
+            setWrapperSize();
+            // 모든 객체 재생성
+            wrapper.innerHTML=""; // 자식 요소 모두 제거
+            iceCreams = [];
+            words = [];
+            init(); // iceCreams와 words 재생성
+        });
+        
+    </script>
+</head>
+<body>
+    <div id="wrapper"></div>
+</body>
+</html>

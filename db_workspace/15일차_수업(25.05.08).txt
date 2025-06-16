@@ -1,0 +1,195 @@
+-- mysql 제약 조건 부여하기
+-- Oracle과 거의 싱크로율 98%
+
+-- 데이터베이스 목록 조회
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| dev                |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.08 sec)
+
+-- 데이터베이스 선택하기
+mysql> use dev;
+Database changed
+
+-- 선택된 데이터베이스 내의 존재하는 테이블 목록
+mysql> show tables;
+Empty set (0.02 sec)
+
+-- mysql에서 제약조건 부여하여 테이블 만들기
+mysql>  CREATE TABLE MEMBER2(
+    ->    member2_id int primary key auto_increment
+    ->    , user_id varchar(20) unique
+    ->    , name varchar(15) not null
+    ->    , regdate timestamp default now()
+    ->    , gender char(6) check (gender='남' or gender='여')
+    -> );
+
+mysql> insert into member2(user_id, name, gender)
+    -> values('scott', '스캇', '요');
+ERROR 3819 (HY000): Check constraint 'member2_chk_1' is violated.
+
+-- 제약조건 check를 위반함에 따라 성별을 '여'로 수정하여 재입력
+mysql> insert into member2(user_id, name, gender)
+    -> values('scott', '스캇', '여');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from member2;
++------------+---------+------+---------------------+--------+
+| member2_id | user_id | name | regdate             | gender |
++------------+---------+------+---------------------+--------+
+|          1 | scott   | 스캇 | 2025-05-08 17:22:52 | 여     |
++------------+---------+------+---------------------+--------+
+1 row in set (0.00 sec)
+
+mysql> show tables;
++---------------+
+| Tables_in_dev |
++---------------+
+| dept          |
+| emp           |
+| member2       |
++---------------+
+3 rows in set (0.00 sec)
+
+mysql> select * from emp;
++-------+--------+-----------+------+---------------------+------+------+--------+
+| empno | ename  | job       | mgr  | hiredate            | sal  | comm | deptno |
++-------+--------+-----------+------+---------------------+------+------+--------+
+|  7369 | SMITH  | CLERK     | 7902 | 1980-12-17 00:00:00 |  800 | NULL |     20 |
+|  7499 | ALLEN  | SALESMAN  | 7698 | 1981-02-20 00:00:00 | 1600 |  300 |     30 |
+|  7521 | WARD   | SALESMAN  | 7698 | 1981-02-22 00:00:00 | 1250 |  500 |     30 |
+|  7566 | JONES  | MANAGER   | 7839 | 1981-04-02 00:00:00 | 2975 | NULL |     20 |
+|  7654 | MARTIN | SALESMAN  | 7698 | 1981-09-28 00:00:00 | 1250 | 1400 |     30 |
+|  7698 | BLAKE  | MANAGER   | 7839 | 1981-05-01 00:00:00 | 2850 | NULL |     30 |
+|  7782 | CLARK  | MANAGER   | 7839 | 1981-06-09 00:00:00 | 2450 | NULL |     10 |
+|  7788 | SCOTT  | ANALYST   | 7566 | 1987-04-19 00:00:00 | 3000 | NULL |     20 |
+|  7839 | KING   | PRESIDENT | NULL | 1981-11-17 00:00:00 | 5000 | NULL |     10 |
+|  7844 | TURNER | SALESMAN  | 7698 | 1981-09-08 00:00:00 | 1500 |    0 |     30 |
+|  7876 | ADAMS  | CLERK     | 7788 | 1987-05-23 00:00:00 | 1100 | NULL |     20 |
+|  7900 | JAMES  | CLERK     | 7698 | 1981-12-03 00:00:00 |  950 | NULL |     30 |
+|  7902 | FORD   | ANALYST   | 7566 | 1981-12-03 00:00:00 | 3000 | NULL |     20 |
+|  7934 | MILLER | CLERK     | 7782 | 1982-01-23 00:00:00 | 1300 | NULL |     10 |
++-------+--------+-----------+------+---------------------+------+------+--------+
+14 rows in set (0.00 sec)
+
+mysql> select ename, job from emp
+    -> ;
++--------+-----------+
+| ename  | job       |
++--------+-----------+
+| SMITH  | CLERK     |
+| ALLEN  | SALESMAN  |
+| WARD   | SALESMAN  |
+| JONES  | MANAGER   |
+| MARTIN | SALESMAN  |
+| BLAKE  | MANAGER   |
+| CLARK  | MANAGER   |
+| SCOTT  | ANALYST   |
+| KING   | PRESIDENT |
+| TURNER | SALESMAN  |
+| ADAMS  | CLERK     |
+| JAMES  | CLERK     |
+| FORD   | ANALYST   |
+| MILLER | CLERK     |
++--------+-----------+
+14 rows in set (0.00 sec)
+
+-- 물리적으로 분리된 EMP와 DEPT를 마치 하나의 테이블처럼 합쳐서 보여주기 (Join 기법)
+mysql> SELECT ENAME, SAL, DNAME, LOC
+    -> FROM EMP, DEPT;
++-------+------+------------+----------+
+| ENAME | SAL  | DNAME      | LOC      |
++-------+------+------------+----------+
+| SMITH	|  800 | OPERATIONS | BOSTON   |
+| SMITH	|  800 | SALES      | CHICAGO  |
+| SMITH	|  800 | RESEARCH   | DALLAS   |
+| SMITH	|  800 | ACCOUNTING | NEW YORK |
+| ALLEN	| 1600 | OPERATIONS | BOSTON   |
+| ALLEN	| 1600 | SALES      | CHICAGO  |
+| ALLEN	| 1600 | RESEARCH   | DALLAS   |
+| ALLEN	| 1600 | ACCOUNTING | NEW YORK |
+| WARD	| 1250 | OPERATIONS | BOSTON   |
+| WARD	| 1250 | SALES      | CHICAGO  |
+| WARD	| 1250 | RESEARCH   | DALLAS   |
+| WARD	| 1250 | ACCOUNTING | NEW YORK |
+| JONES	| 2975 | OPERATIONS | BOSTON   |
+| JONES	| 2975 | SALES      | CHICAGO  |
+| JONES	| 2975 | RESEARCH   | DALLAS   |
+| JONES	| 2975 | ACCOUNTING | NEW YORK |
+| MARTIN| 1250 | OPERATIONS | BOSTON   |
+| MARTIN| 1250 | SALES      | CHICAGO  |
+| MARTIN| 1250 | RESEARCH   | DALLAS   |
+| MARTIN| 1250 | ACCOUNTING | NEW YORK |
+| BLAKE	| 2850 | OPERATIONS | BOSTON   |
+| BLAKE	| 2850 | SALES      | CHICAGO  |
+| BLAKE	| 2850 | RESEARCH   | DALLAS   |
+| BLAKE	| 2850 | ACCOUNTING | NEW YORK |
+| CLARK	| 2450 | OPERATIONS | BOSTON   |
+| CLARK	| 2450 | SALES      | CHICAGO  |
+| CLARK	| 2450 | RESEARCH   | DALLAS   |
+| CLARK	| 2450 | ACCOUNTING | NEW YORK |
+| SCOTT	| 3000 | OPERATIONS | BOSTON   |
+| SCOTT	| 3000 | SALES      | CHICAGO  |
+| SCOTT	| 3000 | RESEARCH   | DALLAS   |
+| SCOTT	| 3000 | ACCOUNTING | NEW YORK |
+| KING	| 5000 | OPERATIONS | BOSTON   |
+| KING	| 5000 | SALES      | CHICAGO  |
+| KING	| 5000 | RESEARCH   | DALLAS   |
+| KING  | 5000 | ACCOUNTING | NEW YORK |
+| TURNER| 1500 | OPERATIONS | BOSTON   |
+| TURNER| 1500 | SALES      | CHICAGO  |
+| TURNER| 1500 | RESEARCH   | DALLAS   |
+| TURNER| 1500 | ACCOUNTING | NEW YORK |
+| ADAMS	| 1100 | OPERATIONS | BOSTON   |
+| ADAMS	| 1100 | SALES      | CHICAGO  |
+| ADAMS	| 1100 | RESEARCH   | DALLAS   |
+| ADAMS	| 1100 | ACCOUNTING | NEW YORK |
+| JAMES	|  950 | OPERATIONS | BOSTON   |
+| JAMES	|  950 | SALES      | CHICAGO  |
+| JAMES	|  950 | RESEARCH   | DALLAS   |
+| JAMES	|  950 | ACCOUNTING | NEW YORK |
+| FORD  | 3000 | OPERATIONS | BOSTON   |
+| FORD  | 3000 | SALES      | CHICAGO  |
+| FORD  | 3000 | RESEARCH   | DALLAS   |
+| FORD  | 3000 | ACCOUNTING | NEW YORK |
+| MILLER| 1300 | OPERATIONS | BOSTON   |
+| MILLER| 1300 | SALES     	| CHICAGO  |
+| MILLER| 1300 | RESEARCH	| DALLAS   |
+| MILLER| 1300 | ACCOUNTING | NEW YORK |
++--------+------+------------+----------+
+56 rows in set (0.00 sec)
+
+-- 위 JOIN을 이용하면 아무런 조건이 없으므로, N x M의 레코드가 조합이 되므로,
+-- 두 테이블의 공통이 되는 키값을 이용하여 조건을 부여하면 정상적으로 레코드 합칠 수 있음
+-- (예상 레코드 수 14개)
+-- 조건 : EMP의 DEPTNO와 DEPT의 DEPTNO가 같은 것만 골라서...
+
+mysql> SELECT ENAME, SAL, DNAME, LOC
+    -> FROM EMP, DEPT
+    -> WHERE EMP.DEPTNO=DEPT.DEPTNO;
++--------+------+------------+----------+
+| ENAME  | SAL  | DNAME      | LOC      |
++--------+------+------------+----------+
+| SMITH  |  800 | RESEARCH   | DALLAS   |
+| ALLEN  | 1600 | SALES      | CHICAGO  |
+| WARD   | 1250 | SALES      | CHICAGO  |
+| JONES  | 2975 | RESEARCH   | DALLAS   |
+| MARTIN | 1250 | SALES      | CHICAGO  |
+| BLAKE  | 2850 | SALES      | CHICAGO  |
+| CLARK  | 2450 | ACCOUNTING | NEW YORK |
+| SCOTT  | 3000 | RESEARCH   | DALLAS   |
+| KING   | 5000 | ACCOUNTING | NEW YORK |
+| TURNER | 1500 | SALES      | CHICAGO  |
+| ADAMS  | 1100 | RESEARCH   | DALLAS   |
+| JAMES  |  950 | SALES      | CHICAGO  |
+| FORD   | 3000 | RESEARCH   | DALLAS   |
+| MILLER | 1300 | ACCOUNTING | NEW YORK |
++--------+------+------------+----------+
+14 rows in set (0.00 sec)

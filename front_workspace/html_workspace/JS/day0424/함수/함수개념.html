@@ -1,0 +1,18 @@
+<script>
+    // 함수란? 재사용성이 높은 코드를 대상으로 영역을 지정하여 이름을 붙여놓은 단위
+
+    function dan(n){
+        if(n<=9){
+            for(let i=1; i<=9; i++){
+                document.write(`${n} * ${i} = ${n*i}<br>`);
+                if(i%n==0){
+                    document.write("<br>");
+                }
+            }
+        }
+    }
+    dan(5);
+    dan(3);
+    dan(2);
+    dan(n = prompt("궁금한 구구단을 검색하세요"));
+</script>
