@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #wrapper{
+            width: 900px;
+            height: 600px;
+            margin: auto;
+        }
+        #aside{
+            width: 200px;
+            height: 600px;
+            background-color: aliceblue;
+            float: left;
+        }
+        #section{
+            width: 700px;
+            height: 600px;
+            background-color: antiquewhite;
+            position: relative;
+            float: left;
+            background-image: url(../../images/plane/bg.jpg);
+        }
+        
+        button{
+            border-color: rgb(8, 8, 119);
+            border-width: 2px;
+            width: 60px;
+            height: 50px;
+            color: black;
+            border-radius: 10%;
+            text-align: center;
+        }
+        img{
+            width: 40px;
+        }
+
+        #plane{
+            left: 100px;
+            top: 100px;
+            position: absolute;
+        }
+
+    </style>
+    <script>
+        
+        let LR = 100;
+        
+        function moveRight(){
+            LR += 1;
+            let plane = document.querySelector("#plane");
+            plane.style.left=LR+"px";
+        }
+
+        function moveLeft(){
+            LR -= 1;
+            let plane = document.querySelector("#plane");
+            plane.style.left=LR+"px";
+        }
+
+        let UD = 100;
+
+        function moveUp(){
+            UD -= 1;
+            let plane = document.querySelector("#plane");
+            plane.style.top=UD+"px";
+        }
+
+        function moveDown(){
+            UD += 1;
+            let plane = document.querySelector("#plane");
+            plane.style.top=UD+"px";
+        } 
+
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="aside">
+            <table>
+                <tr>
+                    <td></td>
+                    <td><button onclick="moveUp();">UP</button></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><button onclick="moveLeft();">LEFT</button></td>
+                    <td><button onclick="moveDown();">DOWN</button></td>
+                    <td><button onclick="moveRight();">RIGHT</button></td>
+                </tr>
+            </table>
+        </div>
+        <div id="section">
+            <img id="plane" src="../../images/plane/plane.png" alt="">
+        </div>
+    </div>
+</body>
+</html>

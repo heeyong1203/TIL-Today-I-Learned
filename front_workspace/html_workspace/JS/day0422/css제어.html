@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #container{
+            width: 800px;
+            height: 650px;
+            margin: auto;
+            text-align: center;
+            colum
+        }
+        #aside{
+            width: 200px;
+            height: 650px;
+            background-color: azure;
+            float: left;
+        }
+        #section{
+            width: 600px;
+            height: 650px;
+            background-color: aliceblue;
+            float: left;
+        }
+        img{
+            width: 50px;
+        }
+        img:hover{
+            /* 이미지에 마우스가 올라간 상태 → 선택자가 될 수 있음 */
+            border: 3px solid red;
+            border-radius: 50%;
+        }
+    </style>
+    <script>
+            let op = 1; // 전역변수로 선언해야 프로그램 종료 시까지 값이 유지됨 
+            function setOpa(){
+                let pic = document.querySelector("#pic");
+                //    여전사 이미지를 변수에 담음
+                if (op >= 0.1)
+                op -= 0.1;
+                pic.style.opacity=op;
+                // 기존 값에 음수값 누적
+                console.log(op);
+        }
+    </script>
+</head>
+<body>
+    <!-- div#container>div*2 -->
+    <div id="container">
+        <div id="aside">            
+            투명도 조절 <br>
+            <img src="../../images/warior/plus_btn.png" alt="">
+            <img onclick="setOpa();" src="../../images/warior/minus_btn.png" alt="">
+        </div>
+        <div id="section">
+            <img id="pic" src="../../images/warior/warior.png" alt="">
+        </div>
+    </div>
+</body>
+</html>

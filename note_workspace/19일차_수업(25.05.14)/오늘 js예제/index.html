@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{margin: 0px;}
+        #stage{
+            width: 1296px;
+            height: 576px;
+            background-image: url(../../../front_worspace/html_workspace/images/슈팅_횡스크롤/bg.jpg);
+            margin: auto;
+            position: relative;
+        }
+    </style>
+    <script>
+        let stage;
+
+        bgEffect(){
+            stage=document.getElementById("stage");
+            
+        }
+
+        function init(){
+            bgEffect();
+        }
+
+        addEventListener("load",function(){
+            init();
+        })
+    </script>
+</head>
+<body>
+    <div id="stage"></div>
+</body>
+</html>

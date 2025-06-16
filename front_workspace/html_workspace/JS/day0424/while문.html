@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        // for문, while문 둘 다 사용 가능 → 다만 사용하기 더 유리한 상황에 맞게 사용하는 것이 중요
+        // for문이나 while문이나 소괄호 안이 true인 경우 반복 수행하는 매커니즘이 동일함
+        // for문, whhile문; 컴퓨터에게 몇 회 반복을 이해사키기 위해서는 
+        // 1. 변수 기억이 최우선 과제(=초기화 혹은 초기값 설정)
+        // 2. n보다 작아? 참이면 수행해
+        // 3. 기억했던 변수의 증감 (증감식이 없다면 무한반복이 발생하기 때문)
+
+        let i=1;
+
+        while(i <= 3){ //table의 레코드 있는 만큼
+            console.log("AA");
+            i++;
+        }
+
+        for(let n=1; n<=3; n++){
+            console.log("BB");
+        }
+
+        let a=1;
+        do{
+            console.log(a);
+            a++
+        }while(a<5)
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
