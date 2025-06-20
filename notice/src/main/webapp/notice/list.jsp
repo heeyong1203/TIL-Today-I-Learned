@@ -26,7 +26,8 @@
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}%>
+	}
+%>
 <!-- 
 JSP란? Java Server Page 즉 자바기술로 만든 서버 측에서 실행되는 페이지
 		= 서블릿과 목적이 같다!! 
@@ -70,6 +71,7 @@ List<Notice> list = new ArrayList();
 
 while (rs.next()) {
 	Notice notice = new Notice();
+	notice.setNotice_id(rs.getInt("notice_id"));
 	notice.setTitle(rs.getString("title"));
 	notice.setWriter(rs.getString("writer"));
 	notice.setRegdate(rs.getString("regdate"));
@@ -100,6 +102,7 @@ th, td {
 tr:nth-child(even) {
 	background-color: #f2f2f2;
 }
+a{text-decoration: none}
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script type="text/javascript">
@@ -130,7 +133,7 @@ tr:nth-child(even) {
 		<%for(Notice notice : list){%>		
 		<tr>
 			<td>0</td>
-			<td><%=notice.getTitle()%> </td>
+			<td><a href="/notice/detail.jsp?notice_id=<%=notice.getNotice_id()%>"><%=notice.getTitle()%></a></td>
 			<td><%=notice.getWriter()%></td>
 			<td><%=notice.getRegdate()%></td>
 			<td><%=notice.getHit()%></td>
