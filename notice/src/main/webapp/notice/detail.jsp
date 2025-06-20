@@ -107,9 +107,8 @@ input[type=button]:hover {
   <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){  // addEventListener("load", function(){}); ì ëì¼...
+		$("#summernote").summernote("code",{});
 		$("#summernote").summernote("code", "<%=notice.getContent()%>");	
-	
-	
 
 		$("input[type='button']").click(()=>{
 
