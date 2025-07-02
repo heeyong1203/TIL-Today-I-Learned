@@ -27,6 +27,14 @@ replay_pid*
 .metadata
 .settings/
 .classpath
+*.project
+.factorypath
+
+# Maven build
+target/
+
+# Tomcat config
+Servers/
 
 # Eclipse IDE 설정 캐시 제외
 .metadata/
@@ -46,6 +54,10 @@ Thumbs.db
 # 환경설정 파일
 *.iml
 *.class
+
+# 기타 임시 파일
+*.tmp
+*.bak
 
 # IntelliJ IDEA
 .idea/
