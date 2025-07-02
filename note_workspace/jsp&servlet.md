@@ -311,3 +311,10 @@ YourProject/
 - oauth
 
 
+## 49일차 수업(25.07.02)
+### 엔터프라이즈 개발자
+```
+표현계층 (Presentation Layer) : html, js, css...
+→ Business Layer : DAO...
+→ Persistence Layer : Mybatis...
+```
