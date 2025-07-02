@@ -1,73 +1,42 @@
 package com.sinse.practiceapp.repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.ibatis.session.SqlSession;
 
 import com.sinse.practiceapp.exception.PracticeNoticeException;
 import com.sinse.practiceapp.model.PracticeNotice;
-import com.sinse.practiceapp.pool.PoolManager;
+import com.sinse.practiceapp.mybatis.MybatisConfig;
 
 // CRUD
 public class PracticeNoticeDAO {
-	
-	PoolManager poolManager = PoolManager.getInstance();
+	MybatisConfig config = MybatisConfig.getInstance();
 	
 	// 모든 레코드 가져오기
 	public List<PracticeNotice> selectAll() {
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		List<PracticeNotice> list = new ArrayList<>();
-		
-		try {
-			con = poolManager.getConnection();
-			String sql = "select * from notice order by notice_id DESC";
-			pstmt = con.prepareStatement(sql);
-			rs = pstmt.executeQuery();
-			
-			while(rs.next()) {
-				PracticeNotice notice = new PracticeNotice();
-				notice.setPracticeNotice_id(rs.getInt("notice_id"));
-				notice.setTitle(rs.getString("title"));
-				notice.setWriter(rs.getString("writer"));
-				notice.setContent(rs.getString("content"));
-				notice.setDate(rs.getString("regdate"));
-				notice.setHit(rs.getInt("hit"));
-				
-				list.add(notice);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			poolManager.release(con, pstmt, rs);
-		}
-		
+		SqlSession sqlSession = config.getSqlSession();
+		List<PracticeNotice> list = sqlSession.selectList("Notice.selectAll");
+		sqlSession.close();
 		return list;
 	}
 	
 	// 하나만 조회하기
-	public PracticeNotice select() {
-		return null;
+	public PracticeNotice select(int notice_id) {
+		SqlSession sqlSession = config.getSqlSession();
+		PracticeNotice notice = sqlSession.selectOne("Notice.select", notice_id);
+		sqlSession.close();
+		return notice;
 	}
 	
 	// 데이터 추가하기
 	public void insert(PracticeNotice notice) throws PracticeNoticeException {
-		Connection con = null;
-		PreparedStatement pstmt = null;
+		SqlSession sqlSession = config.getSqlSession();
+		int result = sqlSession.insert("Notice.insert", notice);
+		sqlSession.commit();
+		sqlSession.close();
 		
-		try {
-			con = poolManager.getConnection();
-			StringBuffer sql = new StringBuffer();
-			sql.append("insert into notice(title, writer, content)");
-			sql.append(" values(?, ?, ?)");
-			pstmt = con.prepareStatement(sql.toString());
-			//pstmt.setString(1, );
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if(result<1) {
+			throw new PracticeNoticeException("등록 실패");
 		}
 	}
 	

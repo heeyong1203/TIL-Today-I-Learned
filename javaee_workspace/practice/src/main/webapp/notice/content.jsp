@@ -1,9 +1,17 @@
+<%@page import="com.sinse.practiceapp.model.PracticeNotice"%>
+<%@page import="com.sinse.practiceapp.repository.PracticeNoticeDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
+<%! PracticeNoticeDAO noticeDAO = new PracticeNoticeDAO(); %>
+<%
+	int notice_id = Integer.parseInt(request.getParameter("notice_id"));
+	PracticeNotice notice = noticeDAO.select(notice_id);
+	
+%>
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
 <style>
 body {font-family: Arial, Helvetica, sans-serif;}
 * {box-sizing: border-box;}
@@ -48,20 +56,31 @@ input[type=button]:hover {
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
 <script type="text/javascript">
-	$(()=>{
+	$(()=>{		
 		$("#content").summernote({
-			height: 250
-		});
+			height:250,
+		});	//서머노트 연동 
+		$("#content").summernote('code', "<%=notice.getContent()%>");
 		
-		$("input[type='button']").click(()=>{
+	
+		$("#bt_edit").click(()=>{
 			$("form").attr({
-				action: "/practice/list.jsp",
 				method: "POST",
+				action: "notice/edit"
 			});
-			$("form").submit();
+		});
+	
+		$("#bt_delete").click(()=>{
+			
 		});
 		
-	})
+	
+		$("#bt_list").click(()=>{
+			location.href="/notice/list.jsp"
+		});
+		
+	});
+		
 </script>
 </head>
 <body>
@@ -70,18 +89,24 @@ input[type=button]:hover {
 
 <div class="container">
   <form>
-	<label for="fname">First Name</label>
-    <input type="text" id="fname" name="firstname" placeholder="Your name..">
+  <!-- hidden: html의 컴포넌트의 역할을 수행하나 눈에 보이지는 않게 처리 노출되지 않은 상태로 데이터를 전송할 때 사용 -->
+    <input type="hidden" id="notice_id" name="notice_id" value="<%=notice.getNotice_id() %>">
+    
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" value="<%=notice.getTitle() %>">
 
-    <label for="lname">Last Name</label>
-    <input type="text" id="lname" name="lastname" placeholder="Your last name..">
+    <label for="writer">Writer</label>
+    <input type="text" id="writer" name="writer" value="<%=notice.getWriter() %>">
 
-    <label for="subject">Subject</label>
-    <textarea id="content" name="subject" placeholder="Write something.." style="height:200px"></textarea>
+    <label for="content">Content</label>
+    <textarea id="content" name="content" placeholder="내용 입력" style="height:200px"></textarea>
 
-    <input type="button" value="Submit">
+    <input type="button" value="수정" id="bt_edit">
+    <input type="button" value="삭제" id="bt_del">
+    <input type="button" value="목록" id="bt_list">
   </form>
 </div>
 
 </body>
 </html>
+

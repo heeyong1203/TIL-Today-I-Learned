@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class PracticeNotice {
-	private int practiceNotice_id;
+	private int notice_id;
 	private String title;
 	private String writer;
 	private String content;

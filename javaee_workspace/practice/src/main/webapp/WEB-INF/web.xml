@@ -6,6 +6,15 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>registServlet</servlet-name>
-		<url-pattern>/practice/regist</url-pattern>
+		<url-pattern>/notice/regist</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>updateServlet</servlet-name>
+		<servlet-class>com.sinse.practiceapp.controller.UpdateServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>updateServlet</servlet-name>
+		<url-pattern>/notice/edit</url-pattern>
 	</servlet-mapping>
 </web-app>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="Notice">
+	
+	<!-- 모두 가져오기 -->
+	<select id="selectAll" resultType="Notice">
+		select * from cafe_notice order by notice_id desc
+	</select>
+	
+	<!-- 한 건 추가하기 -->
+	<insert id="insert" parameterType="Notice">
+		insert into cafe_notice(title, writer, content) values (#{title}, #{writer}, #{content})
+	</insert>
+	
+	<!-- 한 건 조회하기 -->
+	<select id="select" parameterType="int" resultType="Notice">
+		select * from cafe_notice where notice_id = #{notice_id};
+	</select>
+	
+</mapper>
