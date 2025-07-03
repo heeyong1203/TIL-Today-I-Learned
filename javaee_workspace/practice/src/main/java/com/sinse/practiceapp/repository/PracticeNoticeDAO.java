@@ -41,13 +41,35 @@ public class PracticeNoticeDAO {
 	}
 	
 	// 데이터 수정하기
-	public void update() {
+	public void update(PracticeNotice notice) throws PracticeNoticeException {
+		SqlSession sqlSession = config.getSqlSession();
+		int result = sqlSession.update("Notice.update", notice);
+		sqlSession.commit();
+		sqlSession.close();
 		
+		if(result<1) {
+			throw new PracticeNoticeException("수정 실패");
+		}
 	}
 	
 	// 데이터 삭제하기
-	public void delete() {
+	public void delete(int notice_id) throws PracticeNoticeException {
+		SqlSession sqlSession = config.getSqlSession();
+		int result = sqlSession.delete("Notice.delete", notice_id);
+		sqlSession.commit();
+		sqlSession.close();
 		
+		if(result<1) {
+			throw new PracticeNoticeException("삭제 실패");
+		}
+	}
+	
+	// 레코드 수 반환하기
+	public int selectCount() throws PracticeNoticeException{
+		SqlSession sqlSession = config.getSqlSession();
+		int count = sqlSession.selectOne("Notice.selectCount");
+		sqlSession.close();
+		return count;
 	}
 	
 }

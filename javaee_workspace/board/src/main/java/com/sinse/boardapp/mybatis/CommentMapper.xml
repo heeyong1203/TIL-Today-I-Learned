@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Comment">
+	<select id="selectByNewsId" parameterType="int" resultType="Comment">
+		select * from comment where news_id = #{news_id} order by comment_id desc
+	</select>
+	
+	<select id="select" parameterType="int" resultType="Comment">
+		select * from comment where comment_id=#{comment_id}
+	</select>
+	
+	<insert id="insert" parameterType="Comment">
+		insert into comment(msg, user, news_id) value(#{msg}, #{user}, #{news.news_id})
+	</insert>
+</mapper>

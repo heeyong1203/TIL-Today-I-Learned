@@ -66,14 +66,16 @@ input[type=button]:hover {
 		$("#bt_edit").click(()=>{
 			$("form").attr({
 				method: "POST",
-				action: "notice/edit"
+				action: "/notice/edit"
 			});
+			$("form").submit();
 		});
 	
 		$("#bt_delete").click(()=>{
-			
+			if(confirm("삭제하시겠습니까?")){
+				location.href="/notice/del?notice_id=<%=notice_id%>";
+			}
 		});
-		
 	
 		$("#bt_list").click(()=>{
 			location.href="/notice/list.jsp"
@@ -102,7 +104,7 @@ input[type=button]:hover {
     <textarea id="content" name="content" placeholder="내용 입력" style="height:200px"></textarea>
 
     <input type="button" value="수정" id="bt_edit">
-    <input type="button" value="삭제" id="bt_del">
+    <input type="button" value="삭제" id="bt_delete">
     <input type="button" value="목록" id="bt_list">
   </form>
 </div>

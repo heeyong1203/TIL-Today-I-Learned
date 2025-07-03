@@ -3,7 +3,10 @@
 <%@page import="com.sinse.practiceapp.model.PracticeNotice"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
 <%
-/*	int totalRecord = 26; // 추후 전체 레코드 수로 반환받기
+	PracticeNoticeDAO noticeDAO = new PracticeNoticeDAO();
+	List<PracticeNotice> list = noticeDAO.selectAll();
+	
+	int totalRecord = noticeDAO.selectCount(); // 추후 전체 레코드 수로 반환받기
 	int pageSize = 10; // 한 페이지 당 보여줄 레코드 수
 	int totalPage = (int)Math.ceil((double)totalRecord/pageSize); // 전체 페이지 수
 	int blockSize = 10; // 블럭 당 보여질 페이지 수
@@ -13,11 +16,10 @@
 	};
 	int firstPage = currentPage-((currentPage-1)%blockSize); // 블럭 당 첫 페이지
 	int lastPage = firstPage + (blockSize-1); // 블럭 당 마지막 페이지
-	if(lastPage>=totalRecord){lastPage=totalRecord;} */
+	if(lastPage>=totalRecord) lastPage=totalRecord; 
 	
-	PracticeNoticeDAO noticeDAO = new PracticeNoticeDAO();
-	List<PracticeNotice> list = noticeDAO.selectAll();
 %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -39,7 +41,7 @@ body {
 }
 
 #div1 {
-  height: 616px;
+  height: 680px;
   width: 280px;
   border: 1px solid #DBA111;
 }
@@ -88,21 +90,35 @@ tr:nth-child(even) {
 				<th>작성일</th>
 				<th>조회수</th>
 			</tr>
-			<%for(int i=0; i<list.size(); i++){ %>
+			<%for(int i=firstPage; i<list.size(); i++){ %>
 			<%PracticeNotice notice = list.get(i); %>
 			<tr>
-				<td><%=notice.getNotice_id() %>></td>
+				<td><%=notice.getNotice_id() %></td>
 				<td><a href="/notice/content.jsp?notice_id=<%=notice.getNotice_id()%>"><%=notice.getTitle() %></a></td>
-				<td>Simon Jones</td>
-				<td>2025-07-02</td>
-				<td>2500</td>
+				<td><%=notice.getWriter() %></td>
+				<td><%=notice.getRegdate().substring(0, 10) %></td>
+				<td><%=notice.getHit() %></td>
 			</tr>
 			<%} %>
 			<tr>
 				<td colspan="5"><button>글 등록</button></td>
+				<a href="">[이전]</a>
+				<a href="">[다음]</a>
 			</tr>
 		</table>
 	</div>
+	
+	
+	
+	
+<%="totalRecord="+totalRecord+"<br>"%>
+<%="pageSize="+pageSize+"<br>"%>
+<%="totalPage="+totalPage+"<br>"%>
+<%="blockSize="+blockSize+"<br>"%>
+<%="currentPage="+currentPage+"<br>"%>
+<%="firstPage="+firstPage+"<br>"%>
+<%="lastPage="+lastPage+"<br>"%>
+
 
 </body>
 </html>

@@ -8,6 +8,6 @@ public class PracticeNotice {
 	private String title;
 	private String writer;
 	private String content;
-	private String date;
+	private String regdate;
 	private int hit;	
 }
