@@ -1,11 +1,17 @@
+<%@page import="com.sinse.practiceapp.model.Comment"%>
+<%@page import="java.util.List"%>
+<%@page import="com.sinse.practiceapp.repository.CommentDAO"%>
 <%@page import="com.sinse.practiceapp.model.PracticeNotice"%>
 <%@page import="com.sinse.practiceapp.repository.PracticeNoticeDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
-<%! PracticeNoticeDAO noticeDAO = new PracticeNoticeDAO(); %>
+<%! 
+	PracticeNoticeDAO noticeDAO = new PracticeNoticeDAO(); 
+	CommentDAO commentDAO = new CommentDAO();
+%>
 <%
 	int notice_id = Integer.parseInt(request.getParameter("notice_id"));
 	PracticeNotice notice = noticeDAO.select(notice_id);
-	
+	List<Comment> commentList = commentDAO.selectByNoticeId(notice_id);
 %>
 <!DOCTYPE html>
 <html>
@@ -81,6 +87,11 @@ input[type=button]:hover {
 			location.href="/notice/list.jsp"
 		});
 		
+		$("#bt_comment_regist").click(()=>{
+			method: "POST",
+			action: "/comment/regist"
+		});
+		$("comment_form").submit();
 	});
 		
 </script>
@@ -107,7 +118,34 @@ input[type=button]:hover {
     <input type="button" value="삭제" id="bt_delete">
     <input type="button" value="목록" id="bt_list">
   </form>
+  
+ 	<div id="comment_header">
+		<form id="comment_form">
+			<input type="text" style="width:73%" name="msg">
+			<input type="text" style="width:20%" name="user">
+			<input type="hidden" name="notice_id" value="<%=notice.getNotice_id()%>">
+			<input type="button" id="bt_comment_regist" value="등록">
+		</form>
+	</div>
+	
+ 	<div id="comment_content">
+		<table>
+			<tr>
+				<th>댓글 제목</th>
+				<th>작성자</th>
+				<th>등록일</th>
+			</tr>
+			<%for(Comment comment : commentList){ %>
+			<tr>
+				<td><%=comment.getUser() %></td>
+				<td><%=comment.getMsg() %></td>
+				<td><%=comment.getMsgdate().substring(0, 10) %></td>
+			</tr>
+			<% }%>
+		</table>
+	</div>
 </div>
+
 
 </body>
 </html>

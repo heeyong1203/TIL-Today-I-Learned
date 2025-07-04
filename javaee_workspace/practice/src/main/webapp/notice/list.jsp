@@ -1,23 +1,13 @@
+<%@page import="com.sinse.practiceapp.util.Paging"%>
 <%@page import="com.sinse.practiceapp.repository.PracticeNoticeDAO"%>
 <%@page import="java.util.List"%>
 <%@page import="com.sinse.practiceapp.model.PracticeNotice"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
+<%! PracticeNoticeDAO noticeDAO = new PracticeNoticeDAO(); %>
 <%
-	PracticeNoticeDAO noticeDAO = new PracticeNoticeDAO();
-	List<PracticeNotice> list = noticeDAO.selectAll();
-	
-	int totalRecord = noticeDAO.selectCount(); // 추후 전체 레코드 수로 반환받기
-	int pageSize = 10; // 한 페이지 당 보여줄 레코드 수
-	int totalPage = (int)Math.ceil((double)totalRecord/pageSize); // 전체 페이지 수
-	int blockSize = 10; // 블럭 당 보여질 페이지 수
-	int currentPage = 1; // 현재 유저가 보고 있는 페이지
-	if(request.getParameter("currentPage")!=null){
-		currentPage=Integer.parseInt(request.getParameter("currentPage"));
-	};
-	int firstPage = currentPage-((currentPage-1)%blockSize); // 블럭 당 첫 페이지
-	int lastPage = firstPage + (blockSize-1); // 블럭 당 마지막 페이지
-	if(lastPage>=totalRecord) lastPage=totalRecord; 
-	
+	List<PracticeNotice> noticeList = noticeDAO.selectAll();
+	Paging paging = new Paging();
+	paging.init(noticeList, request);
 %>
 
 <!DOCTYPE html>
@@ -41,9 +31,10 @@ body {
 }
 
 #div1 {
-  height: 680px;
+  height: 780px;
   width: 280px;
   border: 1px solid #DBA111;
+  background-color: #D8D8D8;
 }
 
 table {
@@ -54,17 +45,35 @@ table {
   border: 1px solid #DBA111;
 }
 
+a{
+	text-decoration: none;
+	color: black;
+}
+
 th, td {
   text-align: left;
   padding: 16px;
 }
 
-tr:nth-child(odd) {
-  background-color: #D1D3D4; /* 회색 줄무늬 */
+tr {
+  background-color: #FCFCFC;
+  border-bottom: 1px solid #D1D3D4;
 }
 
-tr:nth-child(even) {
-  background-color: #ffffff;
+tr:nth-child(12) {
+  border-bottom: none; /* 마지막 줄은 라인 생략도 가능 */
+  background-color: #D8D8D8;
+}
+
+tr:last-child {
+  border-bottom: none; /* 마지막 줄은 라인 생략도 가능 */
+  background-color: #D8D8D8;
+}
+
+.pageNum{
+	font-size:27;
+	font-weight:bold;
+	color:#DBA111;
 }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -85,40 +94,58 @@ tr:nth-child(even) {
 		<div id="div1"></div>
 		<table>
 			<tr>
-				<th colspan="2" style="text-align:center">제목</th>
-				<th>작성자</th>
-				<th>작성일</th>
-				<th>조회수</th>
+				<th style="text-align:center">No</th>
+				<th style="text-align:center">제목</th>
+				<th style="text-align:center">작성자</th>
+				<th style="text-align:center">작성일</th>
+				<th style="text-align:center">조회수</th>
 			</tr>
-			<%for(int i=firstPage; i<list.size(); i++){ %>
-			<%PracticeNotice notice = list.get(i); %>
+			<%
+				int curPos = paging.getCurPos();
+				int num = paging.getNum();
+			
+				for(int i = 0 ; i<paging.getPageSize() ; i++) {
+					if(paging.getNum() > 0 && curPos < paging.getTotalRecord()){
+					PracticeNotice notice = noticeList.get(curPos++);
+			%>
 			<tr>
-				<td><%=notice.getNotice_id() %></td>
-				<td><a href="/notice/content.jsp?notice_id=<%=notice.getNotice_id()%>"><%=notice.getTitle() %></a></td>
-				<td><%=notice.getWriter() %></td>
-				<td><%=notice.getRegdate().substring(0, 10) %></td>
-				<td><%=notice.getHit() %></td>
+				<td style="text-align:center"><%=num-- %></td>
+				<td style="text-align:center"><a href="/notice/content.jsp?notice_id=<%=notice.getNotice_id()%>"><%=notice.getTitle() %></a></td>
+				<td style="text-align:center"><%=notice.getWriter() %></td>
+				<td style="text-align:center"><%=notice.getRegdate() %></td>
+				<td style="text-align:center"><%=notice.getHit() %></td>
 			</tr>
-			<%} %>
+			<%} else {%>
 			<tr>
-				<td colspan="5"><button>글 등록</button></td>
-				<a href="">[이전]</a>
-				<a href="">[다음]</a>
+				<td style="text-align:center"></td>
+				<td style="text-align:center"></td>
+				<td style="text-align:center"></td>
+				<td style="text-align:center"></td>
+				<td style="text-align:center"></td>
+			</tr>			
+			<%
+					}
+				} 
+			%>
+			<tr>
+				<td colspan="5" style="text-align:center">
+				<%if(paging.getFirstPage() - 1 > 0){ %>
+				<a href="/notice/list.jsp?currentPage=<%=paging.getFirstPage() - 1%>">[이전]</a>
+				<%} %>
+				<%for (int i = paging.getFirstPage() ; i <= paging.getLastPage() ; i++){ %>
+				<a <%if (paging.getCurrentPage() == i){%>class = "pageNum"<% }%> href="/notice/list.jsp?currentPage=<%=i%>">[<%=i %>]</a>
+				<%} %>
+				<%if (paging.getLastPage() + 1 < paging.getTotalPage()){ %>
+				<a href="/notice/list.jsp?currentPage=<%=paging.getLastPage() + 1%>">[다음]</a>
+				<%} %>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: right;" colspan="5">
+					<button>글 등록</button>
+				</td>
 			</tr>
 		</table>
 	</div>
-	
-	
-	
-	
-<%="totalRecord="+totalRecord+"<br>"%>
-<%="pageSize="+pageSize+"<br>"%>
-<%="totalPage="+totalPage+"<br>"%>
-<%="blockSize="+blockSize+"<br>"%>
-<%="currentPage="+currentPage+"<br>"%>
-<%="firstPage="+firstPage+"<br>"%>
-<%="lastPage="+lastPage+"<br>"%>
-
-
 </body>
 </html>
