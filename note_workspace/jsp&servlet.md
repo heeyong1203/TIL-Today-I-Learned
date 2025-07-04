@@ -318,3 +318,17 @@ YourProject/
 → Business Layer : DAO...
 → Persistence Layer : Mybatis...
 ```
+
+## 50일차 수업(25.07.03)
+- include?
+- mybatis 
+    - collection 1:多 / association 1:1
+    - jtbc commection → 커넥션풀 유틸 클래스를 만들었으나 서버에서 지원함
+    - weblogic, tomcat 등 웹컨테이너는 자체 커넥션풀을 보유하고 있음
+    
+- WAS(Web Application Server : Web Container + Web Server + 추가적인 비즈니스 로직)
+    - Web Container: JavaEE 기술을 이해하는 애플리케이션. 서블릿이나 jsp(java server page)를 실행함
+    - Web Server: 정적 자원(html, css, image)을 전담하는 서버 IIS, Apache 이메일 서버, FTP, DNS Server
+
+
+## 51일차 수업(25.07.04)

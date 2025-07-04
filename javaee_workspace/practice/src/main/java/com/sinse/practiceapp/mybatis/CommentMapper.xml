@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Comment">
+	
+	<!-- 전체 조회하기 -->
+	<select id="selectByNoticeId" parameterType="int" resultType="Comment">
+		select * from cafe_comment where notice_id=#{notice_id}
+	</select>
+	
+	<insert id="insert" parameterType="Comment">
+		insert into cafe_comment(msg, user, notice_id) values (#{msg}, #{user}, #{notice.notice_id})
+	</insert>
+	
+</mapper>
