@@ -332,3 +332,161 @@ YourProject/
 
 
 ## 51일차 수업(25.07.04)
+- tomcat/server.xml: GlobalNamingResources에 커넥션풀 추가
+- Java Naming and Directory Interface
+    - 자원 이름 기반 접근: DB 커넥션, EJB, JMS 등 다양한 자원을 이름으로 조회 가능
+    - WAS 중심 설정: DB 연결 정보 등을 WAS(Web Application Server)에 설정하고, 애플리케이션은 JNDI로 조회만 함
+    - 코드와 설정 분리: DB 정보가 코드에 하드코딩되지 않아 유지보수 용이
+    - 표준화된 접근 방식: 다양한 네이밍/디렉터리 서비스(LDAP 등)와 연동 가능
+
+    * 장점
+    - 중앙 집중형 자원 관리: 여러 애플리케이션이 동일한 설정을 공유 가능
+    - 유지보수 용이: DB 정보 변경 시 코드 수정 없이 WAS 설정만 변경하면 됨
+    - 보안성 향상: 민감한 정보(DB URL, 계정 등)를 코드에 노출하지 않음
+    - 커넥션 풀 활용: 효율적인 DB 커넥션 관리 가능
+
+    * 단점
+    - 설정 복잡성: WAS 설정 파일(server.xml, context.xml 등)을 잘 알아야 함
+    - 초기 학습 난이도: JNDI lookup, InitialContext 등 개념이 생소할 수 있음
+    - 보안 이슈 가능성: 잘못된 설정이나 외부 입력을 통한 JNDI 인젝션 위험 (예: log4j 취약점)
+
+[정식 운영 환경에서 JNDI 활용하기]
+server.xml 편집 → GlobalNamingResource 내부에 Resource태그 추가
+context.xml 편집
+
+[테스트 개발 환경에서 JNDI 활용하기]
+server.xml 편집 → GlobalNamingResource
+
+웹컨테이너(Tomcat)가 제공하는 Connection Pool 사용해보기
+```java
+<Resource
+  		name="jndi/mysql"                           // Java Naming Directory Interface를 이용하겠다. mysql을
+  		auth="Container"                            // webContainer가
+  		type="javax.sql.DataSource"                 // type은 javax.sql의 DataSource로 설정
+  		driverClassName="com.mysql.cj.jdbc.Driver"  // Class.forName에서 사용하던 MySQL driver (maven을 통한 mysql.jar의 해당 위치에 드라이버가 있음)
+  		url="jdbc:mysql://localhost:3306/******"    // DriverManager 객체를 통해 getConnection 메소드에 이용될 url (jdbc:mysql://ip주소:포트번호/데이터베이스명)
+  		username="****"                             // getConnection 메소드에 이용될 username (MySQL 데이터베이스 내의 이용할 유저명)
+  		password="****"                             // getConnection 메소드에 이용될 password (해당 username에 설정된 password)
+  		maxTotal="20"                               // 최대 커넥션풀 개수
+  		maxIdle="10"                                // 유휴 상태로 유지할 수 있는 최대 커넥션 수 (사용중이지 않을 때 닫아둘 수 있는 최대 커넥션 수로 낭비를 방지하기 위함)
+  		maxWaitMilis="-1"                           // 커넥션이 모두 사용 중일 때 대기할 최대 시간(ms): -1이면 무한 대기
+  	/>
+```
+
+
+
+
+
+### 로그 레벨
+```
+자바의 로그 레벨 trace < debug < info < warn < error < fatal
+
+```
+
+### 세션
+- 세션ID, 쿠키, 흔적...
+
+## 52일차 수업(25.07.07)
+### 비동기 방식의 Hibernate 연동!
+- 새로고침 없는 애플리케이션
+
+
+### SPA (Single Page Application) 실습
+- tomcat을 통해 select 박스 내 들어갈 아이템 전달받기
+- 그 동안의 방식을 통해 받게 되면 html 파일로 받기에 새로고침이 일어남
+- 새로고침이 아니라 아이템만 받고 싶다. 즉, 데이터로 받아보자
+
+```java
+response.setContentType("text/html; charset=utf-8"); // html 새로고침 발생 (X)
+response.setContentType("application/json; charset=utf-8"); // 데이터만 변경 (O)
+
+```
+
+### 기본 세팅(maven 환경 설정)
+- lombok 설치 (getter, setter)
+- mysql jdbc 설치 (db 연동)
+- logback 설치 (로그 출력)
+- hibernate-core 5.6.15.Final (hibernate 연동)
+
+### 공통 코드 설계 - DB 연결 및 인코딩 처리
+| 항목 | 설명 |
+|------|------|
+| `hibernate.cfg.xml` | DB 연결 정보 설정 (JDBC URL, 드라이버, 사용자명 등) |
+| `HibernateConfig` | SessionFactory를 관리하는 싱글톤 객체 |
+| `CharacterEncodingFilter` | 클라이언트 요청/응답에 UTF-8 인코딩 적용 |
+---
+### 음식 타입 구현 (선행 데이터)
+**model**  
+  `FoodType.java` → `@Entity`, `@Table(name="food_type")`
+
+**repository**  
+  `FoodTypeDAO.java` → `selectAll()` 작성
+
+**servlet**  
+  `FoodTypeList.java`  
+  `GET /foodtype/list` 요청에 대해 JSON 배열 응답
+
+**js/HTML**  
+  셀렉트 박스를 화면에 구성하고, Ajax를 통해 리스트를 받아 출력
+
+> ✅ `FoodType`은 등록용 폼에서 반드시 먼저 필요하므로, 1순위로 개발됩니다.
+---
+
+### 상점 등록 기능
+**model**  
+  `Store.java` → `@Entity`, 음식 분류는 `@ManyToOne`
+
+**repository**  
+  `StoreDAO.java` → `insert()` 메서드 작성
+
+**servlet**  
+  `StoreRegist.java`  
+  `POST /store/regist` 처리 → `201 Created` 또는 JSON 메시지 응답
+
+**js/HTML**  
+  등록 버튼 클릭 시 폼 데이터를 Ajax로 서버에 전송 → 성공 시 목록 다시 가져오기
+
+---
+
+### 상점 목록 조회
+**servlet**  
+  `StoreList.java`  
+  `GET /store/list` → JSON 배열 반환
+
+**js/HTML**  
+  테이블 출력 함수를 구현하고, 등록 성공 또는 초기 페이지 로딩 시 목록 가져오기
+
+---
+
+### 상세보기 기능 
+
+**servlet**  
+  `StoreDetail.java`  
+  `GET /store/detail?store_id=1` 요청 처리
+
+**js**  
+  상호명을 클릭하면 해당 `store_id`로 요청 → 상세정보 표시
+
+---
+
+### 공통 예외처리 및 응답 메시지
+
+- **exception**  
+  `StoreException`, `FoodTypeException`
+
+- **util**  
+  `Message.java`  
+  → 응답 형태를 통일된 구조(JSON)로 보낼 수 있도록 객체 구성
+
+---
+
+### 공통 예외처리 및 응답 메시지
+
+- **exception**  
+  `StoreException`, `FoodTypeException`
+
+- **util**  
+  `Message.java`  
+  → 응답 형태를 통일된 구조(JSON)로 보낼 수 있도록 객체 구성
+
+---
