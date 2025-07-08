@@ -402,20 +402,20 @@ response.setContentType("application/json; charset=utf-8"); // 데이터만 변�
 
 ```
 
-### 기본 세팅(maven 환경 설정)
+#### 기본 세팅(maven 환경 설정)
 - lombok 설치 (getter, setter)
 - mysql jdbc 설치 (db 연동)
 - logback 설치 (로그 출력)
 - hibernate-core 5.6.15.Final (hibernate 연동)
 
-### 공통 코드 설계 - DB 연결 및 인코딩 처리
+#### 공통 코드 설계 - DB 연결 및 인코딩 처리
 | 항목 | 설명 |
 |------|------|
 | `hibernate.cfg.xml` | DB 연결 정보 설정 (JDBC URL, 드라이버, 사용자명 등) |
 | `HibernateConfig` | SessionFactory를 관리하는 싱글톤 객체 |
 | `CharacterEncodingFilter` | 클라이언트 요청/응답에 UTF-8 인코딩 적용 |
 ---
-### 음식 타입 구현 (선행 데이터)
+#### 음식 타입 구현 (선행 데이터)
 **model**  
   `FoodType.java` → `@Entity`, `@Table(name="food_type")`
 
@@ -432,7 +432,7 @@ response.setContentType("application/json; charset=utf-8"); // 데이터만 변�
 > ✅ `FoodType`은 등록용 폼에서 반드시 먼저 필요하므로, 1순위로 개발됩니다.
 ---
 
-### 상점 등록 기능
+#### 상점 등록 기능
 **model**  
   `Store.java` → `@Entity`, 음식 분류는 `@ManyToOne`
 
@@ -448,7 +448,7 @@ response.setContentType("application/json; charset=utf-8"); // 데이터만 변�
 
 ---
 
-### 상점 목록 조회
+#### 상점 목록 조회
 **servlet**  
   `StoreList.java`  
   `GET /store/list` → JSON 배열 반환
@@ -458,7 +458,7 @@ response.setContentType("application/json; charset=utf-8"); // 데이터만 변�
 
 ---
 
-### 상세보기 기능 
+#### 상세보기 기능 
 
 **servlet**  
   `StoreDetail.java`  
@@ -469,7 +469,7 @@ response.setContentType("application/json; charset=utf-8"); // 데이터만 변�
 
 ---
 
-### 공통 예외처리 및 응답 메시지
+#### 공통 예외처리 및 응답 메시지
 
 - **exception**  
   `StoreException`, `FoodTypeException`
@@ -480,7 +480,7 @@ response.setContentType("application/json; charset=utf-8"); // 데이터만 변�
 
 ---
 
-### 공통 예외처리 및 응답 메시지
+#### 공통 예외처리 및 응답 메시지
 
 - **exception**  
   `StoreException`, `FoodTypeException`
@@ -490,3 +490,153 @@ response.setContentType("application/json; charset=utf-8"); // 데이터만 변�
   → 응답 형태를 통일된 구조(JSON)로 보낼 수 있도록 객체 구성
 
 ---
+
+## 53일차 수업(25.07.08)
+### SPA (맛집 검색 페이지) 예제 실습
+#### 1단계: 기획 및 데이터 모델 설계
+- 기능 
+  - 음식 유형별 음식점 등록
+  - 등록된 음식점 리스트 출력
+  - 리스트에서 음식점 선택하여 상세 내용 확인 
+  - 상세 내용에서 수정, 삭제 기능
+
+- ERD 설계
+  - FoodType 테이블 + Store 테이블 (Food_type_id=fk)
+  - 1:多 관계: 한 음식 유형에 대해 여러 가게가 있음
+
+#### 2단계 : Hibernate 설정 및 Entity 정의(모델 설정)
+``` java
+@Data // Lombok.. getter/setter 세팅용
+@Entity // 엔터티 선언을 해주어야 함
+@Table (name="store") // 테이블명 지정
+public class Store {
+  @Id // primary key를 지정함
+  private int store_id;
+  private String store_name;
+  private String tel;
+
+  @ManyToOne // 현재 클래스(many) 기준 ManyToOne 지정; 여러 가게가 한 유형에 소속
+  @JoinColumn(name="food_type_id") // DB테이블의 foreign key 컬럼명 지정
+  private FoodType foodType; // food_type_id가 아닌 FoodType객체를 보유함
+}
+```
+| 항목 | 설명 |
+|------|------|
+| `hibernate.cfg.xml` | DB 연결 정보 설정 (JDBC URL, 드라이버, 사용자명 등) |
+| `HibernateConfig` | SessionFactory를 관리하는 싱글톤 객체 |
+
+
+#### 3단계 : DAO 개발
+- hibernate에서 제공하는 Transaction객체 사용
+- session을 try-with-resources 방식을 적용하여 사용
+- try문 내에서 `session.beginTransaction()`으로 시작하여 `tx.commit()`으로 마무리
+
+```java
+# selectAll(){} 
+  1) TypedQuery query = session.createQuery("from Store", Store.class);
+  2) List list = query.getResultList();
+  3) return list;
+
+# select(int store_id){}
+  1) 매개변수로 모델pk값 받아오기
+  2) 해당 pk값의 모델 조회하기
+     Store store = session.get(Store.class, store_id); 
+  3) return store;
+  
+# insert(Store store){}
+  1) 매개변수로 모델 받아오기
+  2) session.save(store)
+
+# update(Store store){}
+  1) 매개변수로 모델 받아오기
+  2) 선택한 모델 수정하기
+     session.update(store)
+
+# delete(int store_id){}
+  1) 매개변수로 모델pk값 받아오기
+  2) 모델 pk값으로 모델 생성하기
+     Store store = session.get(Store.class, store_id);
+  3) 선택한 모델 삭제하기 
+     session.delete(store)
+
+# 공통
+catch문 이하에선 rollback 및 throw StoreException();
+```
+
+### 4단계: 서블릿 구성
+- 클라이언트의 파라미터 받기(request 객체 활용)
+- DAO를 통해 쿼리문 수행(CRUD)
+- 응답은 JSON 형식으로 함
+```java
+String store_id = request.getParameter("store_id");
+...
+Store store = new Store();
+store.setStore_id(Integer.parseInt(store_id));
+
+// 응답 정보 생성
+response.setContentType("application/json"); // html이 아닌 json 형태로! 새로고침 없는 SPA 구성을 위함
+Message message = new Message(); // 응답 정보를 담을 객체(클래스 생성)
+Gson gson = new Gson();
+PrintWriter out = response.getWriter();
+
+storeDAO.insert(store);     // C(insert)인 경우
+storeDAO.select(store_id);  // R(select)인 경우
+storeDAO.update(store);     // U(update)인 경우
+storeDAO.delete(store_id);  // D(delete)인 경우
+
+message.setResult("fail");  // 성공인 경우 success
+message.setMsg(e.getMessage()); // 성공인 경우 CRUD 성공
+String jsonStr = gson.toJson(message); // 문자열로 변환: toJson이 핵심!
+out.print(jsonStr);
+```
+
+### 5단계: 클라이언트 구현 (index.html + jquery + ajax)
+- ajax 사용 환경 세팅
+```js
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+```
+
+### ajax 기능 추가 사용
+- POST방식 (url, type, data, success, error)
+```html
+$.ajax({
+  url:"/store/edit",  <!-- servlet 호출 url (web.xml 매핑!) -->
+  type: "POST",       <!-- 데이터 전송 방식 -->
+  data: {             <!-- 보낼 데이터 내용?? -->
+    food_type_id: $("#aside_detail select").val(),
+    store_id: $("#aside_detail input[name='store_id']").val(),
+    store_name: $("#aside_detail input[name='store_name']").val(),
+    tel: $("#aside_detail input[name='tel']").val()
+  },
+  <!-- 성공 시 출력할 내용 -->
+  success:function(result, status, xhr){ <!-- result? status? xhr? 설명좀 -->
+    console.log("result=",result),
+    console.log("status=",status),
+    console.log("xhr=",xhr)
+    
+    if(xhr.status==204){
+      getStoreList();
+    }
+  },
+  <!-- 에러 발생 시 출력할 내용 -->
+  error:function(xhr, status, err){			<!-- 마찬가지로 설명 좀... -->
+  }
+});
+```
+
+GET방식 (url, type, success, error)
+```html
+$.ajax({
+			url:"/store/detail?store_id="+store_id, <!-- servlet 호출 url, get방식이어서 head로 데이터를 주고 받음 -->
+			type:"GET",    <!-- 데이터 전송 방식 -->
+			success:function(result, status, xhr){
+				$("#aside_detail select").val(result.foodType.food_type_id);
+				$("#aside_detail input[name='store_id']").val(result.store_id);
+				$("#aside_detail input[name='store_name']").val(result.store_name);
+				$("#aside_detail input[name='tel']").val(result.tel);
+			},
+			error:function(xht, status, err){
+				
+			}
+		});
+```

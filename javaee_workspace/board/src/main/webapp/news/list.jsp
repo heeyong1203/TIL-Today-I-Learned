@@ -1,8 +1,8 @@
 <%@page import="com.sinse.boardapp.util.Paging"%>
-<%@page import="java.util.ArrayList"%>
 <%@page import="com.sinse.boardapp.model.News"%>
-<%@page import="java.util.List"%>
 <%@page import="com.sinse.boardapp.repository.NewsDAO"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
 <%! 
 	NewsDAO newsDAO = new NewsDAO();
