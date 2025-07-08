@@ -51,6 +51,7 @@ public class StoreDAO {
 		return list;
 	}
 	
+	// pk값으로 한 건 조회하기
 	public Store select(int store_id) throws StoreException {
 		Transaction tx = null;
 		Store store = null;
@@ -65,6 +66,39 @@ public class StoreDAO {
 			throw new StoreException("조회 실패", e);
 		}
 		return store;
+	}
+	
+	// 한 건 수정하기
+	public void update(Store store) throws StoreException {
+		Transaction tx = null;
+		
+		try(Session session = config.getSession()){
+			tx=session.beginTransaction();
+			session.update(store);
+			tx.commit();
+		} catch(Exception e) {
+			e.printStackTrace();
+			tx.rollback();
+			throw new StoreException("수정 실패", e);
+		}
+	}
+	
+	// 한 건 삭제하기
+	public void delete(int store_id) throws StoreException {
+		Transaction tx = null;
+		
+		try(Session session = config.getSession()){
+			tx = session.beginTransaction();
+			Store store = session.get(Store.class, store_id);
+			if(store!=null) {
+				session.delete(store);
+			}
+			tx.commit();				
+		} catch (Exception e) {
+			e.printStackTrace();
+			tx.rollback();
+			throw new StoreException("삭제 실패", e);
+		}
 	}
 }
 

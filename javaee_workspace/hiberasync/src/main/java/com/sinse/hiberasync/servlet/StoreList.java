@@ -32,9 +32,6 @@ public class StoreList extends HttpServlet {
 			message.setMsg(e.getMessage());
 			out.print(gson.toJson(message));
 		}
-		
-		request.getParameter("");
-		
 	}	
 
 }

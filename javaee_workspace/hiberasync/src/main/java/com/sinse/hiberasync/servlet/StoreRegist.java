@@ -54,12 +54,14 @@ public class StoreRegist extends HttpServlet {
 			// 200, 500 HTTP Status 코드: 서버가 클라이언트에게 응답 시 보내는 코드 (성공, 실패)
 			// IETF(Internet Engineering Task Force): 인터넷 표준 프로토콜을 정의하는 국제 단체
 			response.setStatus(HttpServletResponse.SC_CREATED); //201
+			message.setResult("success");
+			message.setMsg("등록 성공");
 		} catch (StoreException e) {
 			e.printStackTrace();
 			message.setResult("fail");
 			message.setMsg(e.getMessage()); // 에러 메시지
-			out.print(gson.toJson(message)); // 메시지가 json 문자열로 변환되어 전송됨
 		}
-		
+		String jsonResult = gson.toJson(message);
+		out.print(jsonResult); // 즉시 전송되는 게 아니라, 웹컨테이너가 스트림에 쓴 내용을 모으고, 응답을 commit할 타이밍에 브라우저로 전송		
 	}
 }
