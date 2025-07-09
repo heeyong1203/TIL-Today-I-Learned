@@ -31,7 +31,7 @@ public class StoreList extends HttpServlet {
 			message.setResult("fail");
 			message.setMsg(e.getMessage());
 			out.print(gson.toJson(message));
-		}
+		}	
 	}	
 
 }

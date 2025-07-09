@@ -1,18 +1,7 @@
-<%@page import="com.sinse.boardapp.model.Notice"%>
-<%@page import="com.sinse.boardapp.repository.NoticeDAO"%>
+<%@page import="com.sinse.mvcapp.model.Notice"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
-<%! NoticeDAO noticeDAO = new NoticeDAO(); %>
 <%
-	// 요청 객체로부터 파라미터 뽑아내기
-	// 이 스크립틀릿 영역은 이 jsp가 서블릿으로 변경되어질 때, service() 메서드 영역이므로 이미 service() 메서드의
-	// 매개변수로 요청객체와 응답객체를 넘겨 받은 상태임
-	// service(HttpServletRequest request, HttpServletResponse response)
-	String notice_id = request.getParameter("notice_id"); // 웹을 통해 넘어온 파라미터는 전부 String
-
-	// String sql = "select * from notice where notice_id ="+notice_id;
-	// out.print(sql);
-	Notice notice = noticeDAO.select(Integer.parseInt(notice_id));
-	
+	Notice notice = (Notice)session.getAttribute("notice");
 %>
 <!DOCTYPE html>
 <html>
@@ -84,7 +73,7 @@ input[type=button]:hover {
 		$("#bt_del").click(()=>{
 			if(confirm("삭제하시겠어요?")){
 				// Get방식 요청(링크)
-				location.href="/notice/del?notice_id=<%=notice_id%>";
+				location.href="/notice/del?notice_id=<%=notice.getNotice_id()%>";
 			}
 		});
 		

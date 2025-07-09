@@ -28,10 +28,6 @@ public class UploadServlet extends HttpServlet {
 		uploadPath=config.getServletContext().getRealPath(config.getInitParameter("uploadPath"));
 	}
 	
-	public UploadServlet() {
-		uploadPath="/data";
-	}
-	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// String uploadPath = this.getServletContext().getRealPath("/data"); // jsp 내장 객체(request, response, out, session, application)
 		logger.debug("저장할 실제 경로는 "+uploadPath);
@@ -48,7 +44,7 @@ public class UploadServlet extends HttpServlet {
 				if(item.isFormField()) {
 					logger.debug(item.getString("utf-8"));
 				} else {
-					logger.debug(("파일명은 "+item.getName()));
+					logger.debug("파일명은 "+item.getName());
 					item.write(new File(uploadPath, item.getName()));
 					
 					// 세션은 웹컨테이너가 생성하므로, 개발자가 new할 수 없다. 단 이미 생성된 것만 얻어올 수 있다.
