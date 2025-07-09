@@ -31,7 +31,8 @@ public class StoreDetail extends HttpServlet {
 		
 		try {
 			Store store = storeDAO.select(store_id);
-			out.print(gson.toJson(store)); // 문자열로 변환
+			out.print(gson.toJson(store)); // 문자열로 변환 
+			
 		} catch (StoreException e) {
 			e.printStackTrace();
 			message.setResult("fail");

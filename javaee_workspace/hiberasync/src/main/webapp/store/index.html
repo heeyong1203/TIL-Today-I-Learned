@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>맛집 리스트</title>
 <style>
 
 table {
@@ -29,7 +29,7 @@ tr:nth-child(even) {
 #aside_regist {
 	width: 20%;
 	height: 100%;
-	background-color: yellow;
+	background-color: #034694;
 	float: left;
 	text-align: center;
 }
@@ -37,7 +37,7 @@ tr:nth-child(even) {
 #aside_detail {
 	width: 20%;
 	height: 100%;
-	background-color: fuchsia;
+	background-color: #034694;
 	float: left;
 	text-align: center;
 }
@@ -52,20 +52,25 @@ tr:nth-child(even) {
 #content_header {
 	width: 100%;
 	height: 6.25%;
-	background-color: silver;
+	background-color: #DBA111;
 	line-height: 50px;
 	align-content: center;
+}
+
+a{
+	text-decoration: none;
+	color: black;
 }
 
 #list {
 	width: 100%;
 	height: 93.75%;
-	background-color: teal;
+	background-color: silver;
 }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script type="text/javascript">
-	function getFoodList(){
+	function getFoodList(target){
 		// 화면 전체가 아닌 화면의 일부 영역만 바꾸길 원한다.
 		// 따라서 서버로부터 가져올 대상은 html이 아닌 데이터이다.
 		// js의 실행부는 서버에 데이터를 전송하고 받는 능력이 없다. (브라우저의 능력)
@@ -89,7 +94,7 @@ tr:nth-child(even) {
 			for(i=0; i<list.length; i++){
 				tag+="<option value='"+list[i].food_type_id+"'>"+list[i].title+"</option>";
 			}
-			$("#aside_regist select").html(tag); // innerHTML
+			$(target).html(tag); // innerHTML
 		}
 		xhttp.send();//요청 시점이 발생하는 시점
 		console.log("C");
@@ -101,7 +106,17 @@ tr:nth-child(even) {
 		
 		xhttp.open("GET", "/store/detail?store_id="+store_id);
 		xhttp.onload=function(){
-		
+			// 맛집 상호명
+			console.log("서버의 응답 정보는 ", this.responseText); // 여기서의 this = xhttp를 의미
+			let store = JSON.parse(this.responseText); // 문자열로 받은 내용을 다시 객체화
+			// 객체를 Json parsing하여 문자열로 변환하여 서블릿에서 전송
+			// 받은 문자열을 Json parsing하여 다시 객체로 변환하여 사용
+			$("#aside_detail input[name='store_id']").val(store_id); // hidden 채우기
+			
+			$("#aside_detail  input[name='store_name']").val(store.store_name);
+			$("#aside_detail input[name='tel']").val(store.tel);
+			$("#aside_detail select").val(store.foodType.food_type_id);
+			
 		};
 		xhttp.send();
 	}
@@ -154,7 +169,7 @@ tr:nth-child(even) {
 			 	// 목록 가져와 출력하기
 			 	getStoreList();
 			 } else {
-				 this.responseText; // 서버가 보내온 응답 문자열
+				 let json = this.responseText; // 서버가 보내온 응답 문자열
 				 alert(json.msg);
 			 }
 		}
@@ -167,13 +182,70 @@ tr:nth-child(even) {
 		xhttp.send(param); 	
 	}
 	
+	// 수정하기
+	function edit(){
+		let xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "/store/edit");
+		xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		
+		// 서블릿의 응답을 받은 이후 onload
+		xhttp.onload=function(){
+			if(this.status==204){
+				getStoreList(); // 새롭게 갱신될 목록을 요청하기
+			} else {
+				let json = JSON.parse(this.responseText);
+				alert(json.msg);
+			}
+		}
+		
+		// detail 영역의 입력 컴포넌트들로부터 값을 대입하자
+		let param="store_id="+$("#aside_detail input[name='store_id']").val();
+		param+="&store_name="+$("#aside_detail input[name='store_name']").val();
+		param+="&tel="+$("#aside_detail input[name='tel']").val();
+		param+="&food_type_id="+$("#aside_detail select").val();
+		
+		xhttp.send(param);
+	}
+	
+	// 삭제하기
+	function del(){
+		let xhttp = new XMLHttpRequest();
+		xhttp.open("POST", "/store/del");
+		xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		xhttp.onload=function(){
+			if(this.status==204){
+				getStoreList();
+			} else {
+				let json = JSON.parse(this.responseText); // 실패의 원인
+				alert(json.msg);
+			}
+		}
+		let param = "store_id="+$("#aside_detail input[name='store_id']").val();
+		xhttp.send(param);
+	}
+	
 	$(()=>{
-		getFoodList();
+
+		getFoodList("#aside_regist select");
+		getFoodList("#aside_detail select");
 		getStoreList();
 		
 		$("#aside_regist button").click(()=>{
 			regist();
 		});
+		
+		$("#bt_edit").click(()=>{
+			if(confirm("수정하시겠습니까?")){
+				edit();
+			}
+		});
+		
+		$("#bt_del").click(()=>{
+			if(confirm("삭제하시겠습니까?")){
+				del();
+			}
+		});
+		
 	});
 </script>
 </head>
@@ -197,10 +269,12 @@ tr:nth-child(even) {
 			<div id="list"></div>
 		</div>
 		<div id="aside_detail">
-			<select></select> <input type="text" placeholder="맛집 상호명"> <input
-				type="text" placeholder="연락처">
-			<button>수정</button>
-			<button>삭제</button>
+			<select></select> 
+			<input type="hidden" name="store_id">
+			<input name="store_name" type="text" placeholder="맛집 상호명"> 
+			<input name ="tel" type="text" placeholder="연락처">
+			<button id="bt_edit">수정</button>
+			<button id="bt_del">삭제</button>
 		</div>
 	</div>
 </body>
