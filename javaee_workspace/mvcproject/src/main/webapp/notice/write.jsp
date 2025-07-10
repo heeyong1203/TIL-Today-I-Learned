@@ -1,8 +1,4 @@
-<%@page import="com.sinse.mvcproject.model.Notice"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
-<%
-	Notice notice = (Notice)session.getAttribute("notice");
-%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -54,35 +50,22 @@ input[type=button]:hover {
 <script type="text/javascript">
 	$(()=>{		
 		$("#content").summernote({
-			height:250,
+			height:250
 		});	//서머노트 연동 
-		$("#content").summernote('code', "<%=notice.getContent()%>");
 		
 		//버튼에 이벤트 연결 
-		// 0번째-수정
-		$("#bt_edit").click(()=>{
-			// 서버로 입력폼의 내용을 모두 가져가야 하므로, Post 방식으로 보내야 함
+		$("input[type='button']").click(()=>{
 			$("form").attr({
-				method: "POST",
-				action: "/notice/edit"
-			})
-			$("form").submit();
+				action:"/notice/regist.do",
+				
+				//머리에 데이터를 실어 나르게 됨, 따라서 편지봉투에 나르는 겪, 문제1)노출 문제2)내용짤린다
+				//body인 post로 보내자
+				method:"POST",  
+			});
+			$("form").submit(); //전송
 		});
 		
-		// 1번째-삭제
-		$("#bt_del").click(()=>{
-			if(confirm("삭제하시겠어요?")){
-				// Get방식 요청(링크)
-				location.href="/notice/del?notice_id=<%=notice.getNotice_id()%>";
-			}
-		});
-		
-		// 2번째-목록
-		$("#bt_list").click(()=>{
-			location.href="/notice/list.jsp";
-		});
 	});
-		
 </script>
 </head>
 <body>
@@ -91,21 +74,16 @@ input[type=button]:hover {
 
 <div class="container">
   <form>
-  <!-- hidden: html의 컴포넌트의 역할을 수행하나 눈에 보이지는 않게 처리 노출되지 않은 상태로 데이터를 전송할 때 사용 -->
-    <input type="hidden" id="notice_id" name="notice_id" value="<%=notice.getNotice_id() %>">
-    
-    <label for="fname">Title</label>
-    <input type="text" id="title" name="title" value="<%=notice.getTitle() %>">
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" placeholder="제목입력..">
 
-    <label for="lname">Writer</label>
-    <input type="text" id="writer" name="writer" value="<%=notice.getWriter() %>">
+    <label for="writer">Writer</label>
+    <input type="text" id="writer" name="writer" placeholder="작성자 입력..">
 
-    <label for="subject">Content</label>
-    <textarea id="content" name="content" placeholder="내용 입력" style="height:200px"></textarea>
+    <label for="content">Content</label>
+    <textarea id="content" name="content" placeholder="내용입력" style="height:200px"></textarea>
 
-    <input type="button" value="수정" id="bt_edit">
-    <input type="button" value="삭제" id="bt_del">
-    <input type="button" value="목록" id="bt_list">
+    <input type="button" value="Submit">
   </form>
 </div>
 

@@ -1,10 +1,10 @@
 <%@page import="mvcproject.util.Paging"%>
-<%@page import="com.sinse.mvcproject.model.Notice"%>
+<%@page import="mvcproject.notice.domain.Notice"%>
 <%@page import="mvcproject.notice.repository.NoticeDAO"%>
 <%@page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
 <%
-	List<Notice> list = (List)session.getAttribute("noticeList");
+	List<Notice> list = (List)request.getAttribute("noticeList");
   	System.out.println("JSP에서 가져온 list = " + list);
 	Paging paging = new Paging();
 	paging.init(list, request);
@@ -57,9 +57,18 @@ th, td {
   height: 40px;
 }
 
-tr:nth-child(even) {
-   background-color: #FCFCFC;
+tr:nth-child(odd) {
+  background-color: #FCFCFC;
   border-bottom: 1px solid #D1D3D4;
+}
+
+tr:nth-child(even) {
+  background-color: #FCFCFC;
+  border-bottom: 1px solid #D1D3D4;
+}
+
+tr:first-child {
+  background-color: #D8D8D8;
 }
 
 tr:nth-child(12) {
@@ -112,7 +121,7 @@ tr:last-child {
 		%>
 		 	<tr>
 				<td style=	"text-align:center"><%=num-- %></td>
-				<td style="text-align:center"><a href="/notice/content.do?notice_id=<%=notice.getNotice_id()%>"><%=notice.getTitle() %></a></td>
+				<td style="text-align:center"><a href="/notice/detail.do?notice_id=<%=notice.getNotice_id()%>"><%=notice.getTitle() %></a></td>
 				<td style="text-align:center"><%=notice.getWriter() %></td>
 				<td style="text-align:center"><%=notice.getRegdate() %></td>
 				<td style="text-align:center"><%=notice.getHit() %></td>
@@ -132,13 +141,13 @@ tr:last-child {
 		  	<tr>
 				<td colspan="5" style="text-align:center">
 				<%if(paging.getFirstPage() - 1 > 0){ %>
-				<a href="/notice/list.jsp?currentPage=<%=paging.getFirstPage() - 1%>">[이전]</a>
+				<a href="/notice/list.do?currentPage=<%=paging.getFirstPage() - 1%>">[이전]</a>
 				<%} %>
 				<%for (int i = paging.getFirstPage() ; i <= paging.getLastPage() ; i++){ %>
-				<a <%if (paging.getCurrentPage() == i){%>class = "pageNum"<% }%> href="/notice/list.jsp?currentPage=<%=i%>">[<%=i %>]</a>
+				<a <%if (paging.getCurrentPage() == i){%>class = "pageNum"<% }%> href="/notice/list.do?currentPage=<%=i%>">[<%=i %>]</a>
 				<%} %>
 				<%if (paging.getLastPage() + 1 < paging.getTotalPage()){ %>
-				<a href="/notice/list.jsp?currentPage=<%=paging.getLastPage() + 1%>">[다음]</a>
+				<a href="/notice/list.do?currentPage=<%=paging.getLastPage() + 1%>">[다음]</a>
 				<%} %>
 				</td>
 			</tr>
