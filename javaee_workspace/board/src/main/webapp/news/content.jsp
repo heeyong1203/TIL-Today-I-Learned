@@ -1,9 +1,9 @@
-<%@page import="java.util.List"%>
 <%@page import="com.sinse.boardapp.model.Comment"%>
 <%@page import="com.sinse.boardapp.repository.CommentDAO"%>
 <%@page import="com.sinse.boardapp.model.News"%>
 <%@page import="com.sinse.boardapp.repository.NewsDAO"%>
 <%@page import="com.sinse.boardapp.util.Paging" %>
+<%@page import="java.util.List"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%! 
 	NewsDAO newsDAO = new NewsDAO(); 

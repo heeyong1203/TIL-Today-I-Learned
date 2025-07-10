@@ -1,6 +1,6 @@
 <%@page import="com.sinse.boardapp.model.Notice"%>
-<%@page import="java.util.List"%>
 <%@page import="com.sinse.boardapp.repository.NoticeDAO"%>
+<%@page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
 <%! 
 	// list.jsp가 웹컨테이너에 의해, 서블릿으로 작성될 때의 멤버 영역 (선언부)
