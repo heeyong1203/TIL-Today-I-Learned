@@ -125,7 +125,7 @@ chain.doFilter(request, response);
 ### 🆚 Model1 vs Model2(MVC)
 | 구분   | Model1        | Model2 (MVC)        |
 | ---- | ------------- | ------------------- |
-| 구조   | JSP가 모든 역할 수행 | Controller + JSP 분리 |
+| 구조   | JSP가 View+Controller 수행 | Model + Controller + JSP(View) 분리 |
 | 확장성  | 낮음            | 높음                  |
 | 사용 예 | 단순한 게시판       | 대규모 웹 프로젝트          |
 
@@ -135,3 +135,158 @@ Spring MVC의 핵심 원리를 직접 구현해보는 과정이다.
 
 "Spring을 만든다"는 관점에서,
 단순 사용자가 아닌 설계자 시야로 패턴과 구조를 익힐 수 있다.
+
+## 55일차 수업(25.07.10)
+- Web이 아닌 Swing으로 MVC 패턴을 이용해보자
+- Model의 능력: web에서도 Swing에서도 모델은 그대로 사용 가능하다?!!
+
+### 🖥️ 1. Swing 기반 MVC 패턴
+
+- **🔄 Model 재사용성**
+  - Web 애플리케이션용으로 작성된 **DAO · Service · DTO** 등의 비즈니스 로직을 그대로 Swing 애플리케이션에 재사용
+  - Swing에서는 **View**(`JFrame`/`JPanel`)와 **Controller**(`ActionListener`)만 새로 구현하면 됩니다
+
+```java
+// 예시: View
+public class BloodView extends JFrame {
+    // 테이블, 버튼 등 컴포넌트 정의
+    public BloodView() {
+        setTitle("혈액 정보 관리");
+        // 레이아웃 설정, 컴포넌트 배치
+    }
+}
+
+// 예시: Controller
+public class BloodController {
+    private BloodModel model;
+    private BloodView view;
+
+    public BloodController(BloodModel model, BloodView view) {
+        this.model = model;
+        this.view = view;
+        view.getBtnLoad().addActionListener(e -> loadData());
+    }
+
+    private void loadData() {
+        List<Blood> list = model.fetchAll();
+        view.updateTable(list);
+    }
+}
+```
+
+### 🌐 2. Web MVC 복습
+
+### 🚦 Front Controller vs 세부 Controller 구조
+
+#### 🧭 Front Controller (DispatcherServlet)
+
+- 모든 클라이언트 요청을 최초로 수신하는 메인 컨트롤러
+
+- 요청 URI에 따라 어떤 기능(세부 컨트롤러)을 수행할지 결정
+
+- 매핑 파일 (.properties)에서 URI에 해당하는 클래스명(String) 을 조회
+
+- 해당 클래스명을 기반으로:
+
+```Java
+Class.forName(className) // JVM 메소드 영역에 클래스 로드
+
+Controller controller = (Controller)clazz.newInstance(); // 힙 메모리에 인스턴스 생성
+``` 
+- 생성된 세부 컨트롤러 인스턴스를 통해 **`execute(request, response)`** 메서드 실행
+
+#### ⚙️ 세부 Controller (ex. ListController, RegistController)
+
+- Front Controller가 실행한 실제 비즈니스 로직 담당 컨트롤러
+
+- 공통 인터페이스(예: Controller)의 `execute()` 메서드를 구현
+
+- 내부적으로 Model 호출, 결과 저장, View 경로 반환 처리
+
+#### 📂 구조화된 흐름 요약
+```
+ServletContext context = config.getServletContext();
+
+String realPath = context.getRealPath(config.getInitParameter("contextConfigLocation"));
+
+요청 URI → DispatcherServlet → 매핑 파일 확인
+            ↓
+    Class.forName(className) (메소드 영역)
+            ↓
+    clazz.newInstance() (힙 영역)
+            ↓
+    controller.execute(request, response)
+            ↓
+    Model 호출 → 결과 처리 → View 포워딩
+```
+
+✅ 이 구조는 다양한 컨트롤러를 동적으로 처리할 수 있어 유지보수성과 확장성이 뛰어남
+
+#### 🔄 Forward vs Redirect
+
+|구분|Forward|Redirect|
+|-|-|-|
+|요청 횟수|1회 (서버 내부 이동)|2회 (`302 응답` + 클라이언트 재요청)|
+|URL 변화|**유지**|**변경**|
+|데이터 전달|같은 request 공유 <br> `request.setAttribute()` 사용|새 request 생성 <br> → `session.setAttribute()` 또는 URL 파라미터|
+
+```java
+// Forward 예시
+dispatcher.forward(request, response);
+// Redirect 예시
+response.sendRedirect(request.getContextPath() + "/list.do");
+```
+
+#### 🗂️ request.setAttribute vs session.setAttribute
+
+- `Forward` 시: 한 페이지 렌더링용 일회성 데이터 전달 → `request.setAttribute()` 권장
+
+- `sendRedirect` 시: 새 요청이므로 request 사라짐 → 다음 요청에도 유지할 데이터는 `session.setAttribute()` 사용
+
+### 🔧 3. Filter와 인코딩 처리
+
+#### 📝 Filter 인터페이스 메서드
+
+```java
+init(FilterConfig filterConfig)
+
+doFilter(ServletRequest, ServletResponse, FilterChain) (반드시 구현하고 chain.doFilter() 호출)
+
+destroy()
+```
+
+#### 🔠 인코딩 설정 위치
+
+```java
+public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException {
+    // 1) 요청 파라미터 해석 전
+    request.setCharacterEncoding("UTF-8");
+    // 2) 응답 메시지 출력 전
+    response.setCharacterEncoding("UTF-8");
+    // 3) 다음 필터/서블릿 호출
+    chain.doFilter(request, response);
+    // 4) (Optional) 후처리 로직
+}
+```
+- `체인 이전`에 인코딩 설정 필수 → 요청 파라미터 및 응답 메시지 모두 올바른 문자셋으로 처리
+
+- `체인 이후`에 설정 시 이미 파라미터 해석·출력이 끝나 효과 없음
+
+#### 🔗 Filter 체인과 실행 순서
+
+- 여러 Filter 클래스가 등록된 순서대로 `doFilter()` 한 번씩 호출
+
+- 순서 제어
+
+    - `전통 Servlet`: web.xml `<filter-mapping>` 내 순서
+
+    - `Spring Boot`: @Order 또는 `FilterRegistrationBean.setOrder()`
+
+### ✨ 핵심 요약
+
+- Swing 프로젝트에도 MVC 패턴 적용 → `Model 재사용`
+
+- `Web MVC`: Forward/Redirect 차이와 request·session 속성 활용 방법
+
+- `Filter`: 한 클래스의 doFilter() 한 번 구현, 인코딩 설정은 체인 이전에
