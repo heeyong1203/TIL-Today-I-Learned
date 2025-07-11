@@ -68,6 +68,13 @@ WHERE product_id = 1;
 -- 데이터 조회
 SELECT * FROM product WHERE category_id = 3;
 
+-- 테이블 복사
+CREATE TABLE staff
+AS SELECT empno AS no, ename AS name, sal, deptno FROM emp;
+
+-- 같은 mysql에 여러 명의 동시접속자가 있는 경우, pk값 가져올 때 다른 사람이 insert 혹은 delete해서 내가 고른 것이 달라질 수도 있음. 이를 방지하기 위한 방법 (Session에서...)
+SELECT last_insert_id() AS staff_id;
+
 -- 계정
 -- 시스템관리자 / 일반 사용자 / 승인 권한 사용자 / 창고 관리자
 -- UI는 총 3가지 만들기 (시스템관리자 전용 / 사용자 전용 / 창고 관리자 전용)

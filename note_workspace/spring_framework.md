@@ -64,7 +64,7 @@
 
 #### 💡 해결 방법
 - **Front Controller**: 모든 요청을 하나의 서블릿이 받고, 내부적으로 분기 처리
-- **Command Pattern**: 기능별 클래스를 만들어 위임하고, 공통 인터페이스로 처리 (다형성 활용)
+- **Command Pattern**: 기능별 1:1 대응하여 클래스를 만들어 위임하고, 공통 인터페이스로 처리 (다형성 활용) 
 
 ---
 
@@ -290,3 +290,195 @@ public void doFilter(ServletRequest request, ServletResponse response, FilterCha
 - `Web MVC`: Forward/Redirect 차이와 request·session 속성 활용 방법
 
 - `Filter`: 한 클래스의 doFilter() 한 번 구현, 인코딩 설정은 체인 이전에
+
+
+## ✅ 56일차 수업 요약 (2025.07.11)
+
+### 📚 학습 목표
+
+- MVC 패턴 구조 이해 및 적용
+- DispatcherServlet 기반 Command Pattern 프레임워크 설계
+- JSON 기반 설정 파일을 통한 동적 매핑
+- Controller 인스턴스 재사용 구조 구현
+- Service 계층 도입 및 트랜잭션 관리
+- MyBatis의 `<selectKey>` 동작 원리 이해
+
+---
+
+### 🧠 1. 기존 Command Pattern 구조의 문제점
+
+#### 🔧 구조
+기존에는 요청이 들어올 때마다 `properties` 파일을 읽어
+- key = URI
+- value = Controller 클래스 이름
+
+이 값을 기준으로 매번 `new Controller()` 인스턴스를 생성함.
+
+#### ❗ 단점
+- 매 요청마다 파일 I/O + new 연산 → **비효율적**
+- 상태 유지 불가 (동일한 컨트롤러라도 매번 새 객체)
+- GC 부담 증가
+
+> 🧠 **비유**  
+> 손님이 올 때마다 알바를 새로 뽑는 식. 효율도 떨어지고, 일도 못 맡김.
+
+---
+
+### 🔄 2. Controller 인스턴스 미리 생성 & 저장
+
+#### ✅ 해결 방법
+DispatcherServlet이 초기화될 때 미리 JSON 설정 파일을 읽어  
+→ 모든 Controller를 **한 번만 생성하여 Map에 저장**
+
+```json
+{
+  "mappingType": "myframework.web.handler.SimpleUrlHandlerMapping",
+  "controllerMappings": {
+    "/admin/notice/list": "myframework....ListController",
+    "/admin/notice/regist": "myframework...RegistController"
+  },
+  "viewMappings": {
+    "/admin/notice/list/view": "/secure/notice/list.jsp",
+    "/admin/notice/regist/view": "/admin/notice/list"
+  }
+}
+```
+
+#### 🔎 매핑 로딩 과정
+```java
+JsonObject root = JsonParser.parseReader(new FileReader(...)).getAsJsonObject();
+String mappingType = root.get("mappingType").getAsString();
+JsonObject ctrlMap = root.getAsJsonObject("controllerMappings");
+
+Map<String, Controller> handlerMap = new HashMap<>();
+for (Entry<String, JsonElement> e : ctrlMap.entrySet()) {
+  String uri = e.getKey();
+  String className = e.getValue().getAsString();
+  Controller ctrl = (Controller) Class.forName(className).newInstance();
+  handlerMap.put(uri, ctrl);
+}
+```
+💡 즉, 손님이 오기 전에 직원 전원을 미리 고용해놓는 방식!
+
+### 🚪 3. DispatcherServlet의 역할
+#### Servlet 설정 예시 (web.xml)
+```
+<servlet>
+  <servlet-name>adminDispatcher</servlet-name>
+  <servlet-class>DispatcherServlet</servlet-class>
+  <init-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>/WEB-INF/admin-servlet.json</param-value>
+  </init-param>
+</servlet>
+
+<servlet-mapping>
+  <servlet-name>adminDispatcher</servlet-name>
+  <url-pattern>/admin/*</url-pattern>
+</servlet-mapping>
+```
+
+#### 📌 주의할 점
+- JSP 파일이 /admin/ 아래에 있으면 DispatcherServlet이 잡아서 오류
+
+- 따라서 JSP는 /secure/ 아래에 둬야 뷰만 정상적으로 호출됨
+
+### 🧩 4. Spring처럼 HandlerMapping 객체로 분리
+- SimpleUrlHandlerMapping → URI와 Controller 매핑
+
+- viewMappings 도 같은 방식으로 처리
+
+#### 🧠 비유
+- Map은 사물함, URI는 열쇠, Controller는 내용물
+
+- 열쇠만 있으면 꺼내 쓸 수 있음!
+
+### 🔄 5. Controller → Service → DAO 구조
+#### 문제 상황
+- Bio와 Staff를 한 번에 insert 해야 함 (트랜잭션)
+- DAO에서 각각 commit() 하면 같은 트랜잭션이라 볼 수 없음
+
+#### 잘못된 방식 ❌
+- Controller가 SqlSession을 직접 생성 → 역할 침범
+
+#### ✅ 해결 방법: Service 도입
+```java
+public class StaffService {
+  public void regist(Bio bio) {
+    SqlSession session = MybatisConfig.getSession();
+    try {
+      staffDAO.insert(session, bio.getStaff());  // 사원 insert
+      bioDAO.insert(session, bio);               // bio insert
+      session.commit();
+    } catch {
+      session.rollback();
+    } finally {
+      session.close();
+    }
+  }
+}
+```
+#### 🧠 비유
+- DAO: 실무 사원
+
+- Service: 부장님 → 사원에게 일 시키고 성과 판단(트랜잭션)
+
+- Controller: 고객 담당 팀장 → 부장에게 업무 지시만 함
+
+### 🧬 6. MyBatis <selectKey> 동작 원리
+```
+<insert id="insert" parameterType="Staff">
+  insert into staff(name, sal, email) values(#{name}, #{sal}, #{email})
+  <selectKey keyColumn="staff_id" resultType="int" keyProperty="staff_id" order="AFTER">
+    select last_insert_id() as staff_id
+  </selectKey>
+</insert>
+```
+
+#### 💡 핵심
+- insert 후 → DB에서 자동 생성된 PK 값을
+→ 동일 객체의 staff_id 필드에 자동 세팅됨
+
+#### 🧠 이게 가능한 이유?
+- Java에서 staff 객체는 Heap에 존재
+
+- bio.setStaff(staff) 했을 때, bio는 staff 객체의 주소를 저장함
+
+- 이후 staffDAO.insert()로 staff_id 값이 채워지면,
+
+    bio에서 참조하고 있던 그 staff도 동일한 인스턴스 → 값 자동 반영
+
+<br>
+    📦 비유
+    
+    staff = 직원
+    
+    bio = 직원 정보를 담은 봉투
+    
+    봉투에 넣은 직원이 사번을 나중에 발급받아도, 봉투에 들은 내용이 바뀜
+
+#### 🧭 전체 구조 흐름 요약
+```
+요청 URI
+   ↓
+DispatcherServlet (프론트 컨트롤러)
+   ↓
+HandlerMapping (Map으로 Controller 인스턴스 찾아줌)
+   ↓
+Controller (요청 수신)
+   ↓
+Service (트랜잭션 주도)
+   ↓
+DAO (DB 처리)
+   ↓
+ViewResolver → JSP 뷰 응답
+```
+
+#### 📌 결론 
+✔️ Controller 매번 생성 → Map에 미리 생성 구조로 개선
+
+✔️ service 도입으로 트랜잭션 처리 책임 분리
+
+✔️ view/controller 매핑 JSON화로 구조적 명확성 확보
+
+✔️ selectKey + 참조 관계로 insert 후 키 값 연동까지 해결
