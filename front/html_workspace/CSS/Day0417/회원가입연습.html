@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 폼</title>
+</head>
+<body>
+    <table border="1px" width="500px">
+        <tr>
+            <td colspan="2" align="center">회원가입</td>
+        </tr>
+        <tr>
+            <td>ID</td>
+            <td><input type="text" placeholder="ID를 입력하세요"></td>
+        </tr>
+        <tr>
+            <td>Password</td>
+            <td><input type="password" placeholder="Password를 입력하세요" minlength="8" maxlength="12"></td>
+        </tr>
+        <tr>
+            <td>이름</td>
+            <td><input type="text" placeholder="이름을 입력하세요"></td>
+        </tr>
+        <tr>
+            <td>E-mail</td>
+            <td>
+                <input type="text" placeholder="ID를 입력하세요">
+                @
+                <select>
+                    <option value="">google.com</option>
+                    <option value="">naver.com</option>
+                    <option value="">kakao.com</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>메일 수신여부</td>
+            <td>
+                예 <input type="radio" name="receive">
+                아니오 <input type="radio" name="receive">
+            </td>
+        </tr>
+        <tr>
+            <td>보유기술</td>
+            <td>
+                java<input type="checkbox">
+                spring<input type="checkbox">
+                MySQL<input type="checkbox">
+                Linux<input type="checkbox">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center"><button>가입</button></td>
+        </tr>
+    </table>
+</body>
+</html>

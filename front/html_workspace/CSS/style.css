@@ -1,0 +1,24 @@
+/* <style>은 html에서의 태그취급이기 때문에 따오면 안 됨 */
+td {
+    font-size:9px; 
+    color:black;
+}
+input {
+    background-color: yellow;
+}
+
+/* jQuery를 위해서 문법을 잘 알고 있어야 함
+문법 구조 간단함 : 누구를 어떻게 할지
+선택자(누구에게) {
+    속성 : 값; ← 어떤 스타일
+    속성 : 값; ← 어떤 스타일
+}
+
+ex. p { //p 태그에 대해
+        color: red;  //폰트 색상 스타일을 red로
+        font-size : 20px  //폰트 크기 스타일을 20px로
+}
+h1{  //h1 태그에 대해
+    width:100px; height:50px;  // 너비를 100px로, 높이를 50px로
+}
+ */

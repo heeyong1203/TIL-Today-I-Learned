@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #stage{
+            width: 512px;
+            height: 512px;
+            background-color: wheat;
+            border: 1px solid red;
+            position: relative;
+            margin: auto;
+        }
+
+    </style>
+    <script>
+
+        let img;
+        function showInput(){
+            let stage = document.getElementById("stage");
+            if(img!=undefined){ //아무도 시도하지 않은 경우
+                stage.removeChild(img);
+            }
+            
+
+            let n = prompt("과일을 입력하세요. \n1.사과 2.바나나 3.딸기 4.복숭아 5.포도")
+            
+            n = parseInt(n);
+            img = document.createElement("img");
+            
+            img.style.position="absolute";
+
+            if(n == 1){
+                img.src="../../../images/fruit/apple.png";
+            }else if(n == 2){
+                img.src="../../../images/fruit/banana.png";
+            }else if(n == 3){
+                img.src="../../../images/fruit/strawberry.png";
+            }else if(n == 4){
+                img.src="../../../images/fruit/peach.png";
+            }else if(n == 5){
+                img.src="../../../images/fruit/grape.png";
+            }else{
+                alert("지정된 과일명이 아닙니다.")
+            }
+            stage.appendChild(img);
+        }
+
+    </script>
+    </head>
+    <body>
+        <div id="stage"></div>
+        <button onclick="showInput()">if 함수로 불러오기</button>
+        <button></button>
+    </body>
+</html>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	자바의 로그 레벨 trace < debug < info < warn < error < fatal
+	trace: 너무나 많은 사소한 정보까지 출력됨 (운영 환경에서 꺼두어야 함) 
+		ex) for()문에서 i값이 어디까지 와있는지 출력
+	debug:  trace 다음으로 많은 정보 출력 (운영 환경에서 꺼두어야 함) 
+		ex) 파라미터 값 출력, 변수값 출력
+	info: 프로그램의 흐름을 체크 (운영 환경에서 꺼두어야 함)
+		ex) 실행부가 어느 메서드에 도달했고, 수행하는지...
+	▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼(운영환경에서 켜두어도 됨)
+	warn: 주의가 필요한 경고 상황 (당장은 에러가 없지만 추후 에러의 가능성이 있어 주의를 요하는 것들)
+	error: 오류 발생(예외 처리 시)
+ -->
+<configuration>
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>[%d{HH:mm:ss}][%level] %logger - %msg%n</pattern>
+		</encoder>	
+	</appender>
+	
+	<root level="debug">
+		<appender-ref ref="console"/>
+	</root>
+</configuration>

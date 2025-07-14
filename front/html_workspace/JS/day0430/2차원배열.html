@@ -1,0 +1,18 @@
+<script>
+    let fruit = ["사과", "포도", "바나나"]; // 선언과 동시에 값 할당, 암시적으로 new Array() 생성과 같음
+    let car = ["bmw", "benz", "audi"];
+    let food = ["햄버거", "피자", "파스타"];
+
+    let box=[];// 값을 할당하지 않은 채로 선언한 배열
+    box.push(fruit); // 박스라는 배열 내에 fruit이라는 배열을 추가함
+    box.push(car); 
+    box.push(food);
+    // 2차원 배열은 테이블과 같다. 
+
+    for(i=0;i<3;i++){
+        for(j=0;j<3;j++){
+            document.write(box[i][j],"|");
+        }
+        document.write("<br>");
+    }
+</script>

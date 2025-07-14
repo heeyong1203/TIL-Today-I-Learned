@@ -1,0 +1,19 @@
+{
+	"mappingType": "com.sinse.myframework.web.handler.SimpleUrlHandlerMapping",
+	
+	"controllerMappings":{
+		"/admin/notice/list" : "com.sinse.myframework.admin.notice.controller.ListController",
+		"/admin/notice/regist" : "com.sinse.myframework.admin.notice.controller.RegistController",
+		"/admin/notice/detail" : "com.sinse.myframework.admin.notice.controller.DetailController",
+		"/admin/notice/edit" : "com.sinse.myframework.admin.notice.controller.EditController",
+		"/admin/notice/delete" : "com.sinse.myframework.admin.notice.controller.DeleteController"
+	},
+	
+	"viewMappings":{
+		"/admin/notice/list/view" : "/secure/notice/list.jsp",
+		"/admin/notice/regist/view" : "/admin/notice/list",
+		"/admin/notice/detail/view" : "/secure/notice/detail.jsp",
+		"/admin/notice/edit/view" : "/secure/notice/detail.jsp",
+		"/admin/notice/delete/view" : "/admin/notice/list"	
+	}
+}
