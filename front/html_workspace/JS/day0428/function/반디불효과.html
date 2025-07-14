@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{margin: 0;}
+        #wrapper{
+            height: 900px;
+            background-image: url(../../../images/bandi/night.jpg);
+            background-size: 100% 100%;
+            position: relative;
+        }
+    </style>
+    <!-- js코드 가져오기 -->
+    <script src="../../lib/common.js"></script>
+    <script>
+        // console.log("랜덤값 구한 결과는",getRandom());
+        let img;
+        let a = 0.04;
+        let targetX = 600, targetY = 700;
+        let targetO = 0;
+        let flag = true;
+        let count = 0;
+        let interval=0; // 반딧불의 위치를 언제 바꿀지를 결정짓는 변수
+
+        function init(){
+            img = document.createElement("img");
+            img.src="../../../images/bandi/bug.png";
+            img.style.width=20+"px";
+
+            img.style.position="absolute";
+            img.style.left=100+"px";
+            img.style.top=100+"px";
+            img.style.opacity=0;
+
+            document.getElementById("wrapper").appendChild(img);
+        }
+
+        function light(){
+            // 밝기 = 현 밝기 + 계수 * (목표 밝기 - 현 밝기);
+            img.style.opacity=parseFloat(img.style.opacity)+a*(targetO-parseFloat(img.style.opacity));
+            if(flag){
+                targetO += 0.01;
+            }else{
+                targetO -= 0.01;
+            }
+
+            if(targetO <= 0 || targetO >= 1){
+                flag = !flag;
+            }
+        }
+        function setPos(){
+            targetX=getRandom(11)*100;
+            targetY=getRandom(10)*100;
+        }       
+
+        function move(){
+            img.style.left=parseFloat(img.style.left) + a*(targetX-parseFloat(img.style.left))+"px";
+            img.style.top=parseFloat(img.style.top) + a*(targetY-parseFloat(img.style.top))+"px";
+        }
+
+        function gameLoop(){
+            light();
+            count++;
+            // console.log(count);
+            if(count%100==0)setPos();
+            move();
+        }
+
+        window.addEventListener("load", function(){
+            init();
+
+            let wrapper=document.getElementById("wrapper");
+            wrapper.addEventListener("mousedown", function(){
+                targetX=event.clientX;
+                targetY=event.clientY;
+            })
+
+            setInterval("gameLoop()", 10);
+        })
+    </script>
+</head>
+<body>
+    <div id="wrapper"></div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        let div;
+        let a = 0.1; //비율 계수 0.1이 부드럽게 보임
+        let targetX = 500; //도달을 원하는 목표 지점
+
+        function move(){
+            // 나의 위치 = 기존 내 위치 + a*(목표지점 - 나의 위치);
+            // 남은거리에 정해진 비율로 증가할 것이다.
+            div.style.left = parseInt(div.style.left) + (a*(targetX - parseInt(div.style.left)))+"px";
+            setTimeout("move()", 100);
+        }
+        function createRect(){
+            div = document.createElement("div");
+            div.style.background="red";
+            div.style.width=50+"px";
+            div.style.height=50+"px";
+            div.style.position="absolute";
+            div.style.left=0+"px"
+            div.style.top=10+"px"
+            document.body.appendChild(div);
+        }
+
+        function init(){
+            addEventListener("load", function(){
+                createRect(); // 물체 생성 함수 호출
+                setTimeout("move()", 2000); 
+            })
+        }
+
+        init();
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

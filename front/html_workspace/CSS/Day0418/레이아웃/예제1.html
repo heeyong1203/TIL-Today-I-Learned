@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+/* 1. 너비 1000px
+   2. 머리말 높이 50px
+   3. 본문 높이 600px
+   4. 꼬리말 50px */
+   #wrapper {
+    width: 1000px;
+    /* 이 요소가 차지하고 남은 공간에 대한 좌,우 여백을 동일하게 배분한다. */
+    /* 너비에는 제한을 두더라도, 
+       높이는 컨텐츠 양에 따라 변경될 여지가 있으니,
+       제한을 두지 않는다. */
+    margin: auto;
+    text-align: center;
+   }
+
+   #header {
+    height: 50px;
+    background-color: burlywood;
+   }
+
+   #content {
+    height: 500px;
+    background-color: beige;
+   }
+
+   #footer {
+    height: 50px;
+    background-color: bisque;
+   }
+    </style>
+</head>
+<body>
+    <!-- 각각의 div 별도 조정 시 유지보수성이 떨어지고,
+    중복의 여지가 있으므로, 가장 바깥쪽에 부모 요소로 div를 추가 생성 -->
+    <div id="wrapper">
+             <div id="header">머리말</div>
+             <div id="content">본문</div>
+             <div id="footer">꼬리말</div>
+    </div>
+</body>
+</html>

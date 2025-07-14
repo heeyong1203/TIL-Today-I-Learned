@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div {
+            background-color: grey;
+            width: 50px;
+            height: 50px;
+        }
+        /* 선택자 자리에 점(.)을 찍으면, 나만의 스타일을 정의한다는 뜻
+           이러한 방법을 가리켜 클래스 정의라고 함 */
+        /* 쓰는 이유 : 재사용 가능성이 높은 스타일에 대해 정의하고자 */
+        .box{
+            background-color: yellow;
+        }
+        .font{
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div>박스1</div>
+    <div class="box">박스2</div>
+    <div class="box" >박스3</div>
+    <!-- div 특징 : 조건 부여 없을 시 화면 끝까지 이어짐 -->
+</body>
+</html>

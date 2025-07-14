@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{margin: 0px;}
+        #wrapper{
+            width: 1250px;
+            height: 700px;
+            background-color: aquamarine;
+            position: relative;
+        }
+        #aside{
+            width: 150px;
+            height: 100%;
+            background-color: aqua;
+            float: left;
+        }
+        #aside * {
+            width: 90%;
+            margin: 2px 8px;
+        }
+        #box{
+            width: 150px;
+            height: 150px;
+            position: relative;
+            margin-top: 50px;
+        }
+        #content{
+            width: 1100px;
+            height: 100%;
+            background-color: azure;
+            background-image: url(../../images/venezia/bg3.jpg);
+            background-size: 1100px, 700px;
+            position: relative;
+            float: left;
+        }
+        #content span{
+            background-color: azure;
+        }
+        #stage{
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <script src="./js/word.js"></script>
+    <script src="../lib/common.js"></script>
+    <script src="./js/HP.js"></script>
+    <script>
+        let wordArray; // 프로그램이 종료될때까지 총 4레벨까지 게임 가능한 
+                          // 데이터 베이스를 담고 있을 전역 변수
+
+        // 프로그램 언어에서 메모장의 데이터를 바로 사용할 수 없으므로, 메모장 파일을 읽어들여,
+        // 그 결과물인 json 문자열을 parsing한 후, 객체리터럴로 반환받아 사용하자
+        // 단, js가 파일에 대한 접근이 불가능하므로, 크롬브라우저가 사용자에게 수락을 받은
+        // 결과를 얻어서 처리해야 함
+        let st; // ineterval : 초기 undefined
+        let wordList=[]; // 단어 스트링 자체가 아닌, 단어 객체 인스턴스가 담겨질 배열
+        let speed=200; // 게임 루프의 속도를 지정할 변수 (스테이지가 길어질수록 값이 낮아짐)
+        let level=0; // 현재 레벨을 판단하는 변수 (몇 번째 배열을 접근할지 판단)
+        let hpArray=[]; // hp 인스턴스를 보관할 배열
+
+        function loadData(e){
+            console.log(e); // 매개변수인 event 내용 확인하여
+                            // js의 접근을 허용시킬 파일을 찾자.
+                            
+            // event의 target의 files를 가보면 0번째에 file 내용 있는 것을 확인
+            let file = e.target.files[0]; // 사용자가 수락한 그 파일...
+
+            // 파일의 내용을 읽기
+            let reader = new FileReader();
+            reader.onload=function(data){ // 비동기
+                console.log(data);
+                
+                let jsonString=data.target.result; // 메모장에 작성된 바로 그 문자열들...
+                let obj=JSON.parse(jsonString); // 문자열이므로, 해석해야함(해석 결과로써)
+                
+                console.log(obj); //js의 객체 리터럴이 출력되어야 함
+                
+                wordArray=obj.wordList; // 전역 변수에 보관...
+                
+                for(let i=0;i<obj.wordList.length;i++){
+                    console.log(obj.wordList[i]);
+                }
+
+                createWord(); // 비동기 방식 이후에나 나와야하기 때문
+
+                // start 버튼 활성화
+                document.getElementById("start").disabled=false;
+            }
+
+            reader.readAsText(file); // 문서 파일이기 때문에...
+        }
+
+        function createWord(){
+            let content = document.getElementById("content");
+            
+                for(let i=0;i<wordArray[level].length;i++){
+                    let word = new Word(content, 70+i*90, getRandomByRange(-350,-10), wordArray[level][i], "yellowgreen");
+                    wordList.push(word); 
+                }
+        }
+
+        function nextStep(){
+            // 모든 단어를 대상으로 tick(), render()
+                for(let i=0;i<wordList.length;i++){
+                    wordList[i].tick();
+                    wordList[i].render();
+                }
+        }
+
+        // 9개의 HP 인스턴스 생성하기
+        function createHP(){
+            for(let j=0;j<3;j++){
+                for(let i=0;i<3;i++){
+                    let hp = new HP(document.getElementById("box"), 40*i, 40*j, 38, 38, "blue", "black")
+                    hpArray.push(hp);
+                }
+            }
+        }
+
+        function gameLoop(){
+            console.log("저 gameLoop 중이에요...");
+            nextStep(); // 단어가 한 발 한 발 내려오게...
+        }
+
+        function clickButton(){
+            let start=document.getElementById("start");
+            start.innerText="Start";
+            start.addEventListener("click", function(){
+                if(st==undefined){
+                    st = setInterval(gameLoop, speed);
+                    start.innerText="Pause";
+                }else{
+                    clearInterval(st);
+                    st=undefined;
+                    start.innerText="Start";
+                }
+            });
+        }
+
+        // 단어를 알아 맞추는 과정에서, wordList의 길이가 0에 도달하면,
+        // 이 판을 다 클리어했다고 판단하여, 레벨을 올려주자
+        function checkLevel(){
+            if(wordList.length==0){
+                alert((level+1)+"Stage Clear");
+                
+                level++;
+                speed*=0.5;
+                createWord();
+            }
+
+        }
+
+        // 사용자가 입력한 단어 비교해서 제거 등 처리
+        // 단어를 놓쳤을 시, HP 제거
+        function checkText(obj){
+            let content=document.getElementById("content");
+
+            // 화면의 배열 수 만큼 비교...
+            for(let i=0; i<wordList.length; i++){
+                if(wordList[i].text==obj.value){
+                    wordList[i].span.style.color="red"
+                    document.querySelector("input[type='text']").value="";
+                    
+                    // 제거하기 (화면에서 제거 + 배열에서도 제거)
+                    content.removeChild(wordList[i].span);
+                    wordList.splice(i, 1);
+                    checkLevel(); // 레벨 올려야 하는지 함수에 맡기기
+                    break;
+                    
+                }else if(wordList[i].top>=700-wordList[i].heigth){
+                    wordList[i].span.style.color="red"
+                    document.querySelector("input[type='text']").value="";
+                    
+                    // 제거하기 (화면에서 제거 + 배열에서도 제거)
+                    content.removeChild(wordList[i].span);
+                    wordList.splice(i, 1);
+
+                    if (hpArray.length>0){
+                        let hp = hpArray[i];
+                        hp.container.removeChild(hp.div);
+                    }
+                }
+
+                checkLevel(); // 레벨 올려야 하는지 함수에 맡기기
+                break;
+
+            }
+
+        }
+
+        function init(){
+            document.querySelector("input[type='file']").addEventListener("change", function(e){
+                loadData(e);
+            })
+            clickButton();
+
+            document.querySelector("#aside input[type='text']").addEventListener("keyup", function(e){
+                // console.log(e.keyCode);
+                if(e.keyCode==13){ // 엔터를 쳤다면...
+                    // 사용자가 입력한 단어와 화면에 생존해 있는 단어 인스턴스 내부의
+                    //span의 innerText를 비교하자
+                    checkText(this);
+                }
+            })
+            createHP();
+        }
+
+
+        addEventListener("load", function(){
+            init();
+        })
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="aside">
+            <input type="file">
+            <button disabled="disabled" id="start"></button>
+            <input type="text" placeholder="단어입력">
+            <div id="box"></div>
+        </div>
+        <div id="content"></div>
+    </div>
+</body>
+</html>

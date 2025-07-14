@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Dept">
+	
+	<resultMap type="Dept" id="DeptEmpMap">
+		<id column="deptno" property="deptno"/>
+		<result column="dname" property="dname"/>
+		<result column="loc" property="loc"/>
+		<collection 
+		 	column="deptno"
+			javaType="java.util.List" 
+			ofType="Emp"
+		 	property="emps"
+		 	select="Emp.selectByDeptno"/>
+	</resultMap>
+	
+	<!-- 부서 목록 출력 -->
+	<select id="selectAll" resultMap="DeptEmpMap">
+		select deptno, dname, loc from dept
+	</select>
+	
+	<!-- deptno를 통해 부서 레코드 가져오기 -->
+	<select id="select" parameterType="int" resultType="Dept">
+		select * from dept where deptno=#{deptno}
+	</select>
+
+	<!-- 
+		select d.deptno, dname, loc, count(e.deptno) 
+		from dept d left outer join emp e 
+		on d.deptno = e.deptno 
+		group by d.deptno, dname, loc; 
+	-->
+
+</mapper>

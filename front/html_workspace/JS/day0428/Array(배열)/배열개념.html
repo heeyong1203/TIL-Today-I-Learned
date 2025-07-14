@@ -1,0 +1,42 @@
+<!-- 배열은 반복문과 같이 다님 / 실과 바늘 같은 관계 -->
+
+<script>
+    // 메모리에 과일명 10개만 올려보기
+    let a = "apple <br>";
+    let b = "banana <br>";
+    let c = "cherry <br>";
+    let d = "pear <br>";
+    let e = "watermelon <br>";
+    let f = "orange <br>";
+    let g = "grape <br>";
+    let h = "pinealpple <br>";
+    let i = "peach <br>";
+    let j = "mango <br>";
+
+    console.log(a, b, c, d, e, f, g, h, i, j)
+    document.write(a, b, c, d, e, f, g, h, i, j+"<br><br>");
+
+    // 배열로 바꿔보자
+    // 배열 요소들의 [순번]을 첨자=index라고 함
+    let fruit=[];
+    fruit[0]="apple";
+    fruit[1]="banana";
+    fruit[2]="cherry";
+    fruit[3]="pear";
+    fruit[4]="watermelon";
+    fruit[5]="melon";
+    fruit[6]="orange";
+    fruit[7]="grape";
+    fruit[8]="pineapple";
+    fruit[9]="peach";
+
+    for(let n=0; n<fruit.length; n++){  // 배열명.length → 배열 내 개수값
+        document.write(fruit[n]+"<br>");
+    }
+
+    let number=[];
+    for(let i=0; i<10; i++){
+        number[i]=i;
+        document.write(number[i]);
+    }
+</script>

@@ -1,0 +1,31 @@
+
+<!-- 모든 태그는 inline 방식 혹은 Block 방식
+ inline : 태그가 같은 수평선 상에 공존 가능한 방식
+          - 너비, 높이 지정 불가 → 화면 분할에 사용할 수 없음
+          - 마진, 패딩 일부 적용 가능 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        span:first-child {
+            width: 100px;
+            height: 100px;
+            background-color: red;
+        }
+        span:nth-child(2) {
+            width: 100px;
+            height: 100px;
+            background-color: yellow;
+        }
+        /* 너비와 높이 지정이 안됨 */
+    </style>
+</head>
+<body>
+    <span>스팬1</span>
+    <span>스팬2</span>
+    <!-- 수평선 상 공존 가능한 형태 -->
+</body>
+</html>

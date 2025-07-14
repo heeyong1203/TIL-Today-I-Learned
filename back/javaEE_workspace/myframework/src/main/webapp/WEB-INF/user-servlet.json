@@ -1,0 +1,21 @@
+{
+	"mappingType": "com.sinse.myframework.web.handler.SimpleUrlHandlerMapping",
+	
+	"controllerMappings":{
+		"/shop/notice/list" 			: "com.sinse.myframework.shop.notice.controller.ListController",
+		"/shop/notice/regist" 	: "com.sinse.myframework.shop.notice.controller.RegistController",
+		"/shop/notice/detail" 		: "com.sinse.myframework.shop.notice.controller.DetailController",
+		"/shop/notice/edit" 		: "com.sinse.myframework.shop.notice.controller.EditController",
+		"/shop/notice/delete"	: "com.sinse.myframework.shop.notice.controller.DeleteController",
+		"/shop/staff/regist"		: "com.sinse.myframework.shop.staff.controller.RegistController"
+	},
+	
+	"viewMappings":{
+		"/shop/notice/list/view" 		: "/user/notice/list.jsp",
+		"/shop/notice/regist/view" 	: "/shop/notice/list",
+		"/shop/notice/detail/view" 	: "/user/notice/detail.jsp",
+		"/shop/notice/edit/view" 		: "/user/notice/detail.jsp",
+		"/shop/notice/delete/view" 	: "/shop/notice/list",
+		"/shop/staff/regist/view" 	: "/user/staff/result.jsp"
+	}
+}
