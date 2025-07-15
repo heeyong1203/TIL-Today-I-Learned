@@ -482,3 +482,347 @@ ViewResolver → JSP 뷰 응답
 ✔️ view/controller 매핑 JSON화로 구조적 명확성 확보
 
 ✔️ selectKey + 참조 관계로 insert 후 키 값 연동까지 해결
+
+# 📘 57일차 수업 정리 (2025.07.15)
+
+## 🌱 스프링 탄생 배경
+
+* 로드 존슨이 기존 EJB(Enterprise Java Beans) 기반 Java 애플리케이션의 복잡성을 비판하며, POJO 기반의 단순한 객체 설계를 제안
+* 이 아이디어에서 출발해 **Spring Framework**가 등장
+* 현재는 XML 설정을 넘어, Java 기반 설정(@Configuration 등)이 일반적
+
+---
+
+## 🧩 스프링의 두 축: DI & AOP
+
+### ✅ 1. DI (Dependency Injection) - 의존성 주입
+
+#### 📌 개념
+
+* 객체 간의 \*\*의존성(Dependency)\*\*을 직접 new로 생성하지 않고, 외부에서 주입받는 방식
+* Spring이 객체를 생성하고 조립한 뒤 주입
+
+#### 📌 목적
+
+* 객체 간 결합도 낮추기
+* 유지보수성과 테스트 용이성 확보
+* 유연한 설계 가능
+
+#### 📌 비유
+
+* `FryPan`(X), `Induction`(X), `Pan`(O) : 특정 구현체가 아닌 상위 개념에 의존해야 변경에 유연
+* → 인터페이스/추상클래스 등으로 선언 + 구현체는 외부에서 주입
+
+#### 📌 예제 코드 (Java Config 방식)
+
+```java
+@Configuration
+public class AppConfig {
+    @Bean
+    public FryPan fryPan() {
+        return new FryPan();
+    }
+
+    @Bean
+    public Induction induction() {
+        return new Induction();
+    }
+
+    @Bean
+    public Cook cook() {
+        return new Cook(induction()); // 생성자 주입
+    }
+}
+```
+
+* `@Configuration`: 이 클래스는 스프링 설정 클래스임을 명시
+* `@Bean`: 메서드가 반환하는 객체를 Spring 컨테이너가 관리하는 Bean으로 등록
+* `Cook` 객체는 `Induction`을 생성자로 주입받음. 즉, 의존성을 외부에서 주입받는 형태
+
+#### 📌 실행 예시
+
+```java
+public class AppMain {
+	public static void main(String[] args) {
+		ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+		Cook cook = context.getBean(Cook.class);
+		cook.cooking();
+	}
+}
+```
+
+* `ApplicationContext`: 스프링 컨테이너. Bean을 생성하고 보관하는 역할
+* `context.getBean(...)`: 객체를 꺼내서 사용. 이 시점에 이미 모든 의존성은 주입 완료됨
+
+#### 📌 XML 방식 예시
+
+```xml
+<bean class="com.sinse.springapp.cook.FryPan" id="fryPan"/>
+<bean class="com.sinse.springapp.cook.Induction" id="induction"/>
+<bean class="com.sinse.springapp.cook.Cook" id="cook">
+    <constructor-arg ref="fryPan"/>
+</bean>
+```
+
+* XML 방식으로 의존성 주입을 설정하는 전통적 방법
+* 현재는 어노테이션 기반 Java 설정이 더 많이 사용됨
+
+---
+
+### ✅ 2. AOP (Aspect Oriented Programming) - 관점 지향 프로그래밍
+
+#### 📌 개념
+
+* 핵심 로직과 \*\*공통 코드(횡단 관심사)\*\*를 분리하는 프로그래밍 방식
+* 공통 기능(로깅, 트랜잭션, 보안 등)을 비즈니스 로직과 분리하여 모듈화
+
+#### 📌 동작 흐름
+
+* 특정 메서드 호출 전/후/예외 발생 시 등 원하는 시점에 Aspect 코드 삽입
+
+#### 📌 사용 어노테이션
+
+| 어노테이션                     | 설명                    |
+| ------------------------- | --------------------- |
+| `@Aspect`                 | AOP를 위한 클래스 정의        |
+| `@Component`              | 빈 등록 (자동 탐색 대상)       |
+| `@Autowired`              | 스프링이 Bean 자동 주입       |
+| `@Before(...)`            | 대상 메서드 실행 전에 공통 코드 실행 |
+| `@EnableAspectJAutoProxy` | AOP 기능 활성화 (프록시 사용)   |
+| `@ComponentScan`          | 해당 패키지에서 Bean을 자동 탐색  |
+
+#### 📌 예제 코드 (BellAspect)
+
+```java
+@Aspect
+@Component
+public class BellAspect {
+    @Autowired
+    private Bell bell;
+
+    @Before("execution(* com.sinse.springapp.school.Student.*(..))")
+    public void ringBell() {
+        bell.sound();
+    }
+}
+```
+
+* `@Aspect`: 이 클래스가 공통 기능을 가진 클래스임을 지정
+* `@Before`: Student 클래스의 모든 메서드 실행 전에 `ringBell()`이 실행됨
+* `bell.sound()`는 공통 기능 (예: 알림음)을 수행하는 코드
+
+#### 📌 AOP 설정 클래스 예시
+
+```java
+@Configuration
+@EnableAspectJAutoProxy
+@ComponentScan("com.sinse.springapp.school")
+public class AppConfig {
+    @Bean
+    public Bell bell() { return new Bell(); }
+
+    @Bean
+    public Student student() { return new Student(); }
+}
+```
+
+#### 📌 실행 예시
+
+```java
+public class AppMain {
+    public static void main(String[] args) {
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        Student student = context.getBean(Student.class);
+        student.getUp();     // 호출 전 bell.sound() 실행됨
+        student.goToSchool();
+        student.study();
+        student.rest();
+        student.haveLunch();
+        student.goHome();
+    }
+}
+```
+
+* `Student`의 메서드를 호출할 때마다 `BellAspect`가 작동하여 공통 로직이 수행됨
+
+#### 🖥 GUI에도 적용되는 DI
+
+```java
+@Configuration
+@EnableAspectJAutoProxy
+@ComponentScan("com.sinse.springapp.gui")
+public class AppConfig {
+    @Bean
+    public JTextField name() { return new JTextField(15); }
+
+    @Bean
+    public JTextField email() { return new JTextField(15); }
+
+    @Bean
+    public JButton bt() { return new JButton("버튼"); }
+
+    @Bean
+    public MyWin myWin() {
+        return new MyWin(name(), email(), bt());
+    }
+}
+```
+
+```java
+public class MyWin extends JFrame {
+    public MyWin(JComponent name, JComponent email, JComponent bt) {
+        setLayout(new FlowLayout());
+        add(name); add(email); add(bt);
+        setSize(200, 150);
+        setVisible(true);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
+
+    public static void main(String[] args) {
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        context.getBean(MyWin.class); // GUI 실행
+    }
+}
+```
+
+* 스프링은 웹 뿐 아니라 데스크탑, 모바일 환경에서도 DI 구조 사용 가능
+
+---
+
+## 🧭 Spring MVC 구조 정리
+
+### 📌 DispatcherServlet 설정 (web.xml)
+
+```xml
+<servlet>
+    <servlet-name>userDispatcher</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+        <param-name>contextClass</param-name>
+        <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+    </init-param>
+    <init-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>com.sinse.springmvc.spring.config.WebConfig</param-value>
+    </init-param>
+</servlet>
+<servlet-mapping>
+    <servlet-name>userDispatcher</servlet-name>
+    <url-pattern>/shop/*</url-pattern>
+</servlet-mapping>
+```
+
+### 📌 Java Config 방식 설정 (WebConfig)
+
+```java
+@Configuration
+@EnableWebMvc
+@ComponentScan(basePackages = {"com.sinse.springmvc.spring.controller"})
+public class WebConfig {
+    @Bean
+    public InternalResourceViewResolver viewResolver() {
+        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
+        viewResolver.setPrefix("/WEB-INF/views/");
+        viewResolver.setSuffix(".jsp");
+        return viewResolver;
+    }
+}
+```
+
+### 📌 컨트롤러 예제 (NoticeController)
+
+```java
+@Controller
+public class NoticeController {
+    Logger logger = LoggerFactory.getLogger(getClass());
+
+    @RequestMapping("/notice/list")
+    public ModelAndView selectAll() {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("list", "게시물 목록");
+        mav.setViewName("notice/list");
+        return mav;
+    }
+
+    @RequestMapping("/notice/registform")
+    public String registForm() {
+        return "notice/write";
+    }
+
+    @RequestMapping(value="/notice/regist", method=RequestMethod.POST)
+    public String regist() {
+        logger.debug("글쓰기 요청 받음");
+        return "redirect:/shop/notice/list";
+    }
+
+    @RequestMapping("/notice/detail")
+    public ModelAndView getDetail() {
+        logger.debug("상세보기 요청 받음");
+        return null;
+    }
+
+    @RequestMapping(value="/notice/edit", method=RequestMethod.GET)
+    public String update() {
+        logger.debug("수정 요청 받음");
+        return "redirect:/shop/notice/detail?notice_id=33";
+    }
+
+    @RequestMapping(value="/notice/del", method=RequestMethod.GET)
+    public String delete() {
+        logger.debug("삭제 요청 받음");
+        return "redirect:/shop/notice/list";
+    }
+}
+```
+
+---
+
+## ✅ 오늘의 키워드 총정리
+
+| 개념                          | 설명                                           |
+| --------------------------- | -------------------------------------------- |
+| **DI**                      | 의존성 주입: 객체를 외부에서 주입 (new X)                  |
+| **AOP**                     | 공통 기능 분리 (횡단 관심사, Aspect)                    |
+| **@Bean**                   | 개발자가 직접 등록하는 스프링 Bean                        |
+| **@ComponentScan**          | 특정 패키지 내 Bean 자동 탐색                          |
+| **@EnableWebMvc**           | Spring MVC 설정 활성화                            |
+| **@EnableAspectJAutoProxy** | AOP 기능 활성화                                   |
+| **@Controller**             | Spring MVC의 Controller 역할 클래스                |
+| **DispatcherServlet**       | 모든 요청을 받아 처리하는 프론트 컨트롤러                      |
+| **ViewResolver**            | JSP 파일의 경로와 확장자 조합기 설정                       |
+| **ApplicationContext**      | 스프링 컨테이너 (Bean 생성 및 관리 담당)                   |
+| **ModelAndView**            | Controller가 Model과 View를 함께 전달할 때 사용         |
+| **redirect**                | insert/update/delete 이후 새로고침 시 중복 방지용 재요청 방식 |
+
+---
+
+## 📌 Spring MVC 흐름 요약
+
+```plaintext
+1. 사용자 요청: /shop/notice/list
+↓
+2. DispatcherServlet이 요청 받음
+↓
+3. @RequestMapping("/notice/list") 메서드 실행
+↓
+4. ModelAndView 객체 생성 및 반환
+↓
+5. ViewResolver가 뷰 이름(예: notice/list)에 prefix/suffix 붙여서 JSP 경로 조합 → /WEB-INF/views/notice/list.jsp
+↓
+6. JSP 출력 (forward 방식)
+```
+
+---
+
+## 🔁 추가 정리: redirect, forwarding, URL 구조
+
+* `return "redirect:/shop/notice/list"`는 **GET 요청**으로 새로 리다이렉트
+* `ModelAndView`는 View와 데이터를 같이 담을 때 사용 (주로 `select` 결과 보여줄 때)
+* `String return`은 View만 반환할 때 (주로 `insert`, `update`, `delete` 처리 후)
+* redirect는 보통 **DB에 영향을 주는 요청 처리 후** 새로고침 문제를 방지하기 위해 사용 (PRG 패턴)
+* 뷰 파일은 `/WEB-INF/views/notice/xxx.jsp`에 위치해야 클라이언트가 직접 접근 못하고 Dispatcher가 제어 가능
+* `ViewResolver`가 prefix/suffix 설정을 했기 때문에 `notice/list`처럼 뷰 이름만 넘겨도 경로 조합됨
+* `@RequestMapping("/notice/list")`는 `/shop` 하위 URL 패턴에서 실행되므로 최종 주소는 `/shop/notice/list`
+* `redirect:` 시에는 다시 DispatcherServlet 경유하므로 `/shop/notice/~` 구조로 지정해야 함
+
+> ✔ 이 구조는 **Spring Web MVC** 패턴의 대표적인 흐름이며, 웹에서 이루어지는 HTTP 요청 기반 개발 구조입니다.
