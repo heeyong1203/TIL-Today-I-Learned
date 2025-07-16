@@ -826,3 +826,117 @@ public class NoticeController {
 * `redirect:` 시에는 다시 DispatcherServlet 경유하므로 `/shop/notice/~` 구조로 지정해야 함
 
 > ✔ 이 구조는 **Spring Web MVC** 패턴의 대표적인 흐름이며, 웹에서 이루어지는 HTTP 요청 기반 개발 구조입니다.
+
+# 📘 58일차 수업 정리 (2025.07.16)
+
+### ✅ @Autowired
+- 스프링 컨테이너로부터 인스턴스를 주입받는 어노테이션.
+- 결국 우리가 어제 배운 **DI(Dependency Injection, 의존성 주입)**을 어노테이션으로 간단하게 구현한 형태.
+- 클래스 간의 결합도를 낮추고 유지보수를 용이하게 하기 위한 설계 패턴이다.
+
+---
+
+### ✅ @RequestMapping
+- 기존 `controllerMapping.properties` 파일처럼 **요청 URL을 컨트롤러 메서드와 연결해주는 역할**.
+- web.xml에 DispatcherServlet이 `/admin/*` 경로에 매핑되어 있으므로,  
+  `@RequestMapping("/notice/list")`는 클라이언트 기준 `/admin/notice/list`를 의미함.
+
+---
+
+### ✅ ModelAndView
+- Model: view로 전달할 데이터를 저장하는 객체 (기존 request.setAttribute와 유사).
+- View: DispatcherServlet → ViewResolver가 참조하는 JSP 페이지의 논리적 이름.
+
+```java
+ModelAndView mav = new ModelAndView();
+mav.addObject("noticeList", list); // 데이터 저장
+mav.setViewName("secure/notice/list"); // 보여줄 JSP
+```
+
+* forwarding 방식: setViewName("...")
+
+* redirect 방식: setViewName("redirect:/admin/notice/list")
+
+---
+
+### ✅ redirect와 forwarding 차이
+
+* redirect: 클라이언트에게 다시 요청하라는 명령. → URL이 변경됨
+
+    - 반드시 DispatcherServlet을 다시 통과해야 하므로 /admin/... 경로 명시해야 함.
+
+* forwarding: 서버 내부에서 해당 JSP로 이동. → URL이 변경되지 않음
+
+    - ViewResolver가 경로 + 확장자 붙여서 JSP 찾아줌.
+
+---
+
+### ✅ AdminWebConfig (자바 기반 설정 클래스)
+
+* Spring의 XML 설정을 대신함.
+
+* 주요 어노테이션:
+
+    - @Configuration: 설정 파일임을 명시
+
+    - @EnableWebMvc: Spring MVC 기능 사용 가능
+
+    - @EnableTransactionManagement: 트랜잭션 사용을 위한 설정 활성화
+
+    - @ComponentScan: 지정된 패키지 내 컴포넌트 자동 스캔
+
+* ViewResolver 등록:
+```java
+@Bean
+public InternalResourceViewResolver resolver() {
+    InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+    resolver.setPrefix("/WEB-INF/views/");
+    resolver.setSuffix(".jsp");
+    return resolver;
+}
+```
+
+---
+
+### ✅ JNDI (Java Naming and Directory Interface)
+
+* 커넥션 풀을 직접 관리하지 않고 톰캣 등 컨테이너에서 제공하는 커넥션을 사용.
+
+* AdminWebConfig에서 아래처럼 작성:
+```java
+JndiTemplate template = new JndiTemplate();
+DataSource ds = template.lookup("java:comp/env/jndi/mysql", DataSource.class);
+```
+* DataSource.class는 타입 캐스팅을 위한 것 (형변환)
+
+---
+
+### ✅ MyBatis와 Hibernate 설정
+
+* 둘 다 트랜잭션이 필요함 (기본 auto-commit이 아님)
+
+* 그래서 transactionManager가 반드시 설정되어야 함.
+
+* transactionManager 설정 후 @EnableTransactionManagement 활성화 필요
+
+---
+
+### ✅ WEB-INF 폴더의 JSP는 직접 접근 불가
+
+* 보안을 위해 웹 브라우저가 직접 접근하지 못함.
+
+* 따라서 Controller를 통해 forwarding 방식으로만 접근 가능.
+
+* DispatcherServlet + ViewResolver 조합으로 .jsp가 보여지는 구조.
+
+---
+
+### 💬 기억할 것들
+
+* redirect:는 클라이언트에게 다시 요청하라는 의미이므로 DispatcherServlet 설정에 맞게 /admin/... 경로를 명시해야 한다.
+
+* forwarding은 viewName을 단순 문자열로 넘기면 됨 (ViewResolver가 prefix/suffix 붙여줌).
+
+* ViewResolver, JNDI, 트랜잭션 설정은 대부분 AdminWebConfig에서 처리.
+
+* Spring MVC는 역할이 명확하게 나뉘어 있으므로 흐름을 구조적으로 이해하자.
