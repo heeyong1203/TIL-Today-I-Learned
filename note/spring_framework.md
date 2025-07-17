@@ -940,3 +940,216 @@ DataSource ds = template.lookup("java:comp/env/jndi/mysql", DataSource.class);
 * ViewResolver, JNDI, 트랜잭션 설정은 대부분 AdminWebConfig에서 처리.
 
 * Spring MVC는 역할이 명확하게 나뉘어 있으므로 흐름을 구조적으로 이해하자.
+
+
+# 📘 58일차 수업 정리 (2025.07.16)
+keyword만 나열하면 gpt가 정리해주겠지? 난 믿는다
+
+@autowired: 스프링컨테이너로부터 인스턴스 주입받기 (injection) 어제 배운 DI??
+DI 상기시켜보자 DI가 뭐였지?
+
+@requestMapping: 결국 .text파일로 매핑했던 controllerMapping과 veiwMapping 중 controllerMapping을 담당함, 다만 DispathcerServlet이 가이드를 하고 있는데, web.xml에서 dispatcherServlet을 거치려면 즉, 1차 Controller 관문에 이르기 위해서는 /admin/*로 접속하라는 url-pattern을 구축해두었으므로 @requestMapping("/notice/list")는 /admin/notice/list를 의미함 여기서 의문은 url-pattern에 /*로 되어 있으면 /admin//notice/list로 인식하는 건 아닌가 하는점
+
+그럼 ViewMapping역할을 하는 것도 있어야 할 거 아니야? > 그래서 내가 있잖아! ModelAndView!: Model과 View를 한번에 처리한다. 여기서의 Model은 MVC에서 일처리를 담당하는 M이 아니라 테이블모델에서의 모델을 의미하는 듯함 (껍데기) 즉, view로 가져갈 데이터는 ModelAndView의 Model에 mav.setObject("noticeList", noticeList);로 저장하고, 보여줄 페이지는 mav.setViewName("secure/notice/list")으로 처리
+다만 이때 setViewName은 포워딩 방식이든, redirect방식이든 처리하는데, forwarding 경우에는 사용할 세부 컨트롤러의 requestMapping url주소를 정확히 입력해주어야 한다.(그러나, DispatcherServlet을 통과한 시점이므로 /admin은 제외하고...) redirect인 경우에는 redirect:"실제경로"를 적는 것이 아니고 접두어, 접미어가 짤려나간 형식의 이름을 적는다. 왜? InternalResourceViewResolver를 우리는 사용했으니까. (이하 viewResolver) viewResolver는 실제 경로를 적게 하되, 접두어, 접미어를 선택할 수 있게 한다. 접두어는 경로, 접미어는 .jsp 이때 .html도 있는데 왜 접미어를 .jsp로 한정지을까 의문이었지만 서버가 처리할 수 있는 것은 즉, 웹컨테이너가 직접 관여할 수 있는 것은 서블릿과 jsp인데, 서블릿은 로직을 담당하고 view 지금 view 얘기중이다. view는 jsp가 담당하므로, 결국 viewName은 .jsp인 jsp들로 한정되어 있을 것이기 때문이다.
+
+### AdminWebConfig...
+spring의 고전적 설정을 담당하는 xml을 대신하는 .java파일이다.
+@Configuration : 왜 사용하더라?
+@EnableWebMvc : web에서 MVC 패턴을 이용하기 위해 필수적인 어노테이션
+@EnableTransactionManagement : mybatis, hibernate 등 sql 쿼리문을 담당할 때 트랜잭션이 필요하기 때문에 달아주는 어노테이션이다.
+@ComponentScan : 모든 컨트롤러, 모든 서비스 객체, 모든 DAO들을 직접 실행하는건 비효율적, 그래서 특정 패키지 내에 있는 컨트롤러, 서비스, dAO를 모두 실행시키기 위한 어노테이션이라고 보면 될 것 같다.
+
+아까 말했듯이 controller가 3. 일시킨다, 4. 저장한다를 마치고 직접 view를 보여주지 않는데, 이것은 AdminWebConfig가 한다고 보면 될듯 하다. 여기서 InternalResourceViewResolver가 사용되었거든...
+viewResolver만 있는 것이 아니고, resolver는 여러 형태가 있는데 내가 배운 건 이것뿐... 그리고 이 Resolver는 접두어, 접미어 세팅이 가능하다.(prefix, suffix)
+
+이 때, viewResolver는 스프링컨테이너의 관리 대상으로 올리기 위해 @Bean 어노테이션을 썼다. (맞나?)
+
+우리는 이제 jdbc Connection Pool을 직접 싱글톤으로 작성한 session들을 여럿 미리 만들어 두어 관리하고 싶지 않다. 이 역할 마저 맡기고 싶어. 그래서 사용한 것이 JNDI!
+JNDI 세팅법은 후에 기술하기로 하고, 일단 JNDI 사용 즉, database 선택을 위한 datasource 세팅도 역시나 AdminWebConfig에서 담당한다.
+
+DataSource 형으로 반환 계획... JndiTemplate이라는 객체를 사용. jndi.lookup(사용 db glomalNaming을 불러온다.) 
+ex) jndi.lookup("java:comp/env/jndi/mysql", DataSource.class) {component의 environment 중 jndi 사용할 건데 mysql, DataSource.class는 무슨 의미인지 모르겠다. 여튼 mysql 사용 선언 같은 느낌인듯}
+이건 @Bean으로 관리 안하나부다. 왜??
+
+
+### mybatis, hibernate
+둘 다 쿼리문 사용 시 트랜잭션이 강요되었던 걸로 기억한다.
+일반 mysql은 기본 auto commit이 true인 반면에 mybatis와 hibernate는 commit을 해줘야했던걸로 기억!
+그래서 transactionManager가 필수다. 이 세팅이 끝나면 결국 AdminWebConfig한테 아까말했듯이 EnableTrasactionManagement 어노테이션을 줘야하는거지...
+
+일단 여기까지 정리해볼까?
+틀린 내용이나 수정 필요한 내용 있나?
+
+
+# 59일차 수업 정리(2025.07.17)
+
+### ✅ 1. 한글 깨짐 문제와 CharacterEncodingFilter
+🔧 왜 깨지냐?
+
+* 요청/응답 시 인코딩 설정이 명확하지 않으면 ISO-8859-1로 처리되어 깨짐 발생
+
+해결 방법:
+
+(1) web.xml 방식:
+
+```xml
+<filter>
+  <filter-name>encodingFilter</filter-name>
+  <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+  <init-param>
+    <param-name>encoding</param-name>
+    <param-value>UTF-8</param-value>
+  </init-param>
+</filter>
+<filter-mapping>
+  <filter-name>encodingFilter</filter-name>
+  <url-pattern>/admin/*</url-pattern>
+</filter-mapping>
+```
+
+(2) Java Config 방식 (WebConfig.java 등):
+
+```java
+@Bean
+public FilterRegistrationBean<CharacterEncodingFilter> characterEncodingFilter() {
+    CharacterEncodingFilter filter = new CharacterEncodingFilter();
+    filter.setEncoding("UTF-8");
+    filter.setForceEncoding(true);
+    
+    FilterRegistrationBean<CharacterEncodingFilter> registration = new FilterRegistrationBean<>();
+    registration.setFilter(filter);
+    registration.addUrlPatterns("/*");
+    return registration;
+}
+```
+
+<br>
+
+### ✅ 2. Spring Bean 등록 개념 정리
+| 어노테이션                                    | 대상  | 역할                              |
+| ---------------------------------------- | --- | ------------------------------- |
+| `@Component`                             | 클래스 | Spring이 관리하는 일반 빈               |
+| `@Controller`, `@Service`, `@Repository` | 클래스 | `@Component`의 세부 역할 분리          |
+| `@Bean`                                  | 메서드 | Java Config에서 명시적으로 객체 등록       |
+| `@ComponentScan`                         | 패키지 | 해당 경로 내의 `@Component` 계열 클래스 스캔 |
+
+<br>
+
+> ✔️ @Bean은 클래스 X, 메서드에 붙여서 직접 객체를 반환 <br>
+> ✔️ @Component는 클래스에 붙여서 자동 등록
+
+<br>
+
+### ✅ 3. DispatcherServlet & ApplicationContext 관계
+
+핵심:
+* DispatcherServlet 하나당 ApplicationContext 하나 <br>
+→ adminDispatcher, userDispatcher가 따로 있으면 각기 다른 컨테이너가 생성됨.
+
+흐름:
+1. web.xml에서 DispatcherServlet 등록 (admin/user 구분)
+
+2. 각각 AdminWebConfig, UserWebConfig로 초기화
+
+3. 내부적으로 AnnotationConfigWebApplicationContext가 각 설정 클래스를 바탕으로 @Bean, @Component 등을 스캔 및 등록
+
+4. Controller 등 싱글톤 빈들이 메모리에 올라감
+
+<br>
+
+### ✅ 4. HandlerMapping, ViewResolver의 흐름
+요청 흐름 요약:
+1. 요청 진입 → DispatcherServlet
+
+2. HandlerMapping이 어떤 Controller로 요청을 보낼지 결정
+
+3. HandlerAdapter가 실제 메서드 실행
+
+4. 결과는 ModelAndView 형태로 반환
+
+5. ViewResolver가 뷰 이름을 .jsp 등의 실제 파일로 변환
+
+6. DispatcherServlet이 View를 forward
+
+```java
+// InternalResourceViewResolver 설정
+@Bean
+public ViewResolver viewResolver() {
+    InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+    resolver.setPrefix("/WEB-INF/views/");
+    resolver.setSuffix(".jsp");
+    return resolver;
+}
+```
+<br>
+
+### ✅ 5. WebConfig 중복 문제 (admin/user)
+현재 문제:
+* AdminWebConfig에만 DataSource, Hibernate 설정 있음
+
+* 하지만 클라이언트는 userDispatcher 먼저 실행
+
+    → 즉, userDispatcher만 실행되면 DB 관련 Bean이 없어 NullPointerException 등 발생 가능
+
+<br>
+
+### ✅ 6. DispatcherServlet 간의 Bean 공유?
+답: 불가능
+* DispatcherServlet마다 독립적인 ApplicationContext를 가짐.
+
+* 하나의 DispatcherServlet이 만든 Bean은 다른 DispatcherServlet에서는 접근 불가
+
+<br>
+
+### ✅ 7. ServletContext vs Session vs Request
+| 범위                                                          | 생존 범위        | 주요 메서드                               |
+| ----------------------------------------------------------- | ------------ | ------------------------------------ |
+| **Request**                                                 | 요청 1번        | `request.setAttribute()`             |
+| **Session**                                                 | 로그인\~브라우저 종료 | `session.setAttribute()`             |
+| **ServletContext**                                          | 서버 실행\~종료    | `getServletContext().setAttribute()` |
+| ⇒ **ServletContext는 가장 상위 범위이며, DispatcherServlet 간 공유 가능** |
+
+
+
+
+한글이 깨진다... servlet에서 characterEncoding, setcontext등 사용했지만 filter 클래스로 따로 빼기도 했다...
+mavenRepository로 이미 CharacterEncodingFilter 클래스가 이미 있으므로, 
+
+@ComponentScan: 특정 패키지 내부에 있는 클래스들을 스프링의 관리대상이 되도록 일괄 요청
+@Bean: 단일등록 > 스프링의 관리대상이 되게 해달라고 일일이 등록
+@Component: @Controller, @Service, @Repository... @bean 중 특별한 기능이 있는 요소들, @bean은 메소드, @component는 클래스 대상인가..? > 마찬가지로 스프링의 관리대상이 되게 해달라. componentScan의 대상이 되게 설정
+
+dispatcherServlet의 web.xml 설정을 .java로 관리하는데 지금 adminDispatcher, userDispatcher로 관리중이다. 클라이언트의 첫 접근 시 모든 controller와 model들을 우선 싱글톤으로 메모리에 올린다?
+
+이전에 spring 만들어볼땐 handler 만들었었는데, 이번엔 굳이 안 만들었다? defaultHandlerMapping이 작동하는건가?
+@Bean <bean class="InternalResourceViewResolver" id="viewResolver"></bean>
+@Bean <bean id="handlerMapping"></bean>
+
+HandlerMapping을 지나면 스프링컨테이너가 만들어진다? 스프링컨테이너??? (applicationContext??) 하위는 AnnotationConfigWebApplicationContext?? 이게 injection의 주체? 
+AnnotationConfigWebApplicationContext는 자루를 가지고 있다. @annotation들을 모두 가지고 있다? 얘를 만나면 일단 모든 annotation이 메모리에 올라가있는다는건가?
+
+스프링컨테이너의 소유자는 누구인가? DispatcherServlet? 지금 adminDispatcher, userDispatcher 모두 web.xml에서 동일 클래스로 지정되어있고 name만 다른데 괜찮은가?
+'org.springframework.web.servlet.DispatcherServlet'
+
+@RequestMapping 등의 모든 매핑작업도 ApplicationContext가 직접 하는건가?
+
+4. 저장하기를 실행한다면 이건 무조건 forwarding이다?
+ModelAndView에 저장을했지? view는 접두어와 접미어를 뺀 일부만 저장, 해석은 DispatcherServlet이 직접 안해. 누가 한다? ViewResolver! (InternalResourceViewResolver)
+view 정보를 해석받으면 DispatcherServlet이 응답받을 view 내용을 톰캣한테 보내준다?
+
+admin, user 각각 Dispatcher config역할을 하는 webConfig.java가 있는데, bean들과 component 설정들을 다 지정하고, mybatis, hibernate들에 대한 정보들도 동일하게 등록할수밖에 없다. 이러면 ApplicationContext는 중복 내용을 갖네? 물론 ApplicationContext가 서로 다른 2개가 있겠지만 동일 내용의 모델 등 굳이 메모리 낭비가 필요한가?
+하나로 만들려면? 하나 이미 등록했으면 다음 webConfig에선 중복되는 건 지워라, View만 남겨라? .... 이해 안감..
+현재 데이터소스 및 db 설정정보는 admin에만 있다. 클라이언트가 admin이 아니라 shoppingmall(user) 먼저 들어오면?? 데이터소스, db 없잖아? viewResolver만 있네.
+admin을 부랴부랴 켰다. handler, spring컨테이너 생성됐는데, userDispather에서 adminDispatcher의 spring컨테이너가 갖고있는 어노테이션 빈들 접근 가능? 불가...
+서블릿 간 공유할 기술이 필요하겠네?
+
+상위 인터페이스? 상위 클래스? 필요한건가? (강사님께 아직 답 받기 전)
+
+JavaEE 요청 처리 흐름에서 무언가를 저장할 수 있는 용도의 객체? Session? request? (request < Session < ??: session보다 더 오래 살아갈 무언가가 있다?
+지난 수업 들 중 배웠던 ServletContext.. getRealPath로 사용했었지...)
+
+Request.. response 클라이언트에게 전달 시 사라짐..
+Session.. cookie 없어지면 무용지물... (창 닫거나, 일정시간 미사용 등등)
+ServletContext..
+
