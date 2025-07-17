@@ -1,6 +1,5 @@
 package com.sinse.mall.spring.config;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +12,8 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = {"com.sinse.mall.admin.controller"})
-public class AdminWebConfig {
+@ComponentScan(basePackages = {"com.sinse.mall.shop.controller"})
+public class UserWebConfig {
 	
 	/*하위 컨트롤러가 3, 4단계를 수행한 후, DispatcherServlet에게 정확한 파일명이 아닌
 	 	파일명의 일부 단서만 반환한다. (ModelAndView에 심어서 반환) 
@@ -30,5 +29,5 @@ public class AdminWebConfig {
 		resolver.setPrefix("/WEB-INF/views/");
 		resolver.setSuffix(".jsp");
 		return resolver;
-	}	
+	}
 }

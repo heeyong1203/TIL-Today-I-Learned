@@ -4,5 +4,7 @@
     	<property name="hibernate.connection.datasource">java:comp/env/jndi/mysql</property>
     	<property name="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</property>
     	<mapping class="com.sinse.mall.domain.Notice"/>
+    	<mapping class="com.sinse.mall.domain.TopCategory"/>
+    	<mapping class="com.sinse.mall.domain.SubCategory"/>
     </session-factory>
 </hibernate-configuration>

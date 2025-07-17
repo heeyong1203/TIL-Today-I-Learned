@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.sinse.mall.domain.Notice;
-import com.sinse.mall.notice.model.NoticeService;
+import com.sinse.mall.model.notice.NoticeService;
 
 import lombok.extern.slf4j.Slf4j;
 
