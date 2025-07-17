@@ -4,6 +4,8 @@
 <configuration>
 	<typeAliases>
 		<typeAlias type="com.sinse.mall.domain.Notice" alias="Notice"/>
+		<typeAlias type="com.sinse.mall.domain.TopCategory" alias="TopCategory"/>
+		<typeAlias type="com.sinse.mall.domain.SubCategory" alias="SubCategory"/>
 	</typeAliases>
 	
 	<environments default="development">
@@ -16,5 +18,7 @@
 	</environments>
 	<mappers>
 		<mapper resource="com/sinse/mall/mybatis/NoticeMapper.xml" />
+		<mapper resource="com/sinse/mall/mybatis/TopCategoryMapper.xml" />
+		<mapper resource="com/sinse/mall/mybatis/SubCategoryMapper.xml" />
 	</mappers>
 </configuration>

@@ -1,4 +1,4 @@
-package com.sinse.mall.notice.model;
+package com.sinse.mall.model.notice;
 
 import java.util.List;
 
