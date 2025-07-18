@@ -1110,17 +1110,101 @@ public ViewResolver viewResolver() {
 | **ServletContext**                                          | 서버 실행\~종료    | `getServletContext().setAttribute()` |
 | ⇒ **ServletContext는 가장 상위 범위이며, DispatcherServlet 간 공유 가능** |
 
+<br>
+
+### ✅ 8. MVC 패턴 5단계
+Spring MVC에서 DispatcherServlet이 요청을 처리하는 5단계 구조:
+
+1. HandlerMapping: 요청 받기
+
+2. HandlerAdapter: 요청 분석하기 (실제 컨트롤러 메서드 호출 방식 결정)
+
+3. Controller (Handler): 일 시킨다. (DAO가 실질적으로 로직을 수행)
+
+4. Controller : 저장 하기 (View로 보여줄 데이터 및 view에 대한 정보 저장)
+
+5. ViewResolver: 어떤 뷰를 반환할지 결정(jsp, html 등)하고 반환
+
+💡 핵심: DispatcherServlet이 이 전체 흐름을 통제하는 중앙 제어자
+
+<br>
+
+### ✅ 9. ApplicationContext(SpringContainer) 구조
+Spring Web 프로젝트에서는 ApplicationContext가 계층적으로 구성됨.
+
+* Root ApplicationContext (공통 Bean 등록)
+
+* DB, Service, DAO 등 공통 Bean
+
+* ContextLoaderListener가 초기화 담당
+
+Servlet ApplicationContext (각 DispatcherServlet마다 별도)
+
+* Controller, ViewResolver 등 Web 관련 Bean
+
+* ex) userWebConfig, adminWebConfig 등
+
+> 💡 따라서 총 3개의 ApplicationContext가 있을 수 있음:
+> Root + user용 ServletContext + admin용 ServletContext
+
+### ✅ 10. ContextLoaderListener의 역할과 ServletContext 생성 시점
+* web.xml에서 <listener>로 등록한 ContextLoaderListener가 서버 시작과 동시에 동작
+
+* 이 리스너가 **RootConfig(XML 또는 JavaConfig)**를 참조해서 Root ApplicationContext 생성
+
+* 이후 <servlet> 태그로 등록된 각각의 DispatcherServlet이 자신의 WebConfig 기반으로 별도 ApplicationContext 생성
+
+> ❗ 순서와 구조는 아래와 같음:
+```text
+Tomcat (서버 시작)
+  → ServletContext 생성
+    → ContextLoaderListener 초기화
+      → Root ApplicationContext 생성
+        → DispatcherServlet 초기화
+          → Servlet-specific ApplicationContext 생성
+```
+
+> 💡 web.xml에서 순서는 아래처럼 보여도 실제 실행 순서는 ContextLoaderListener가 먼저 실행됨 (서버 부팅 시 가장 먼저 실행되도록 설계됨).
+
+```xml
+<!-- 실제 web.xml 구성 예 -->
+<context-param>
+  <param-name>contextConfigLocation</param-name>
+  <param-value>/WEB-INF/spring/root-context.xml</param-value>
+</context-param>
+
+<listener>
+  <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+</listener>
+
+<servlet>
+  <servlet-name>user</servlet-name>
+  <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  <init-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>/WEB-INF/spring/user-web-context.xml</param-value>
+  </init-param>
+</servlet>
+```
+<br>
+
+### ✅ 11. 정리된 구조도
+```
+[ServletContext]
+│
+├── ContextLoaderListener
+│   └── Root ApplicationContext
+│       ├── 공통 Bean (Service, Repository 등)
+│
+├── DispatcherServlet (user)
+│   └── userWebConfig → Servlet ApplicationContext (Controller, ViewResolver)
+│
+└── DispatcherServlet (admin)
+    └── adminWebConfig → Servlet ApplicationContext (Controller, ViewResolver)
+```
 
 
 
-한글이 깨진다... servlet에서 characterEncoding, setcontext등 사용했지만 filter 클래스로 따로 빼기도 했다...
-mavenRepository로 이미 CharacterEncodingFilter 클래스가 이미 있으므로, 
-
-@ComponentScan: 특정 패키지 내부에 있는 클래스들을 스프링의 관리대상이 되도록 일괄 요청
-@Bean: 단일등록 > 스프링의 관리대상이 되게 해달라고 일일이 등록
-@Component: @Controller, @Service, @Repository... @bean 중 특별한 기능이 있는 요소들, @bean은 메소드, @component는 클래스 대상인가..? > 마찬가지로 스프링의 관리대상이 되게 해달라. componentScan의 대상이 되게 설정
-
-dispatcherServlet의 web.xml 설정을 .java로 관리하는데 지금 adminDispatcher, userDispatcher로 관리중이다. 클라이언트의 첫 접근 시 모든 controller와 model들을 우선 싱글톤으로 메모리에 올린다?
 
 이전에 spring 만들어볼땐 handler 만들었었는데, 이번엔 굳이 안 만들었다? defaultHandlerMapping이 작동하는건가?
 @Bean <bean class="InternalResourceViewResolver" id="viewResolver"></bean>
