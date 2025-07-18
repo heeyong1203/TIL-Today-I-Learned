@@ -37,7 +37,25 @@
 - JVM은 클래스를 로딩해 메소드 영역에 올리고, 실행 시 메서드는 스택에 쌓여 흐름을 제어하며, 객체는 힙에 생성되어 스택에서 참조하고, 문자열 리터럴은 상수풀을 통해 중복 없이 관리된다.
 
 
-## 접근 제한자와 리턴 타입
+## 접근 제한자와 리턴 타입<context-param>
+  		<param-name>contextClass</param-name>
+  		<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+  	</context-param>
+  	<context-param>
+  		<param-name>contextConfigLocation</param-name>
+  		<param-value>com.sinse.mall.spring.config.RootConfig</param-value>
+  	</context-param>
+
+AnnotationConfigWebApplicationContext가 기본적으로 servletContext를 보유하고 있고, 서버 작동과 동시에 Listener를 통해 annotation들을 감지하고 있어서, 서버 시작하면 서버내에서 사용될 어노테이션들을 전부 로드한다고 생각했는데 그것이 아니고 rootConfig에 있는 어노테이션들만 로드시켜두는건가?<context-param>
+  		<param-name>contextClass</param-name>
+  		<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+  	</context-param>
+  	<context-param>
+  		<param-name>contextConfigLocation</param-name>
+  		<param-value>com.sinse.mall.spring.config.RootConfig</param-value>
+  	</context-param>
+
+AnnotationConfigWebApplicationContext가 기본적으로 servletContext를 보유하고 있고, 서버 작동과 동시에 Listener를 통해 annotation들을 감지하고 있어서, 서버 시작하면 서버내에서 사용될 어노테이션들을 전부 로드한다고 생각했는데 그것이 아니고 rootConfig에 있는 어노테이션들만 로드시켜두는건가?1
 ### 접근 제한자
 | 접근제한자       | 클래스 내부 | 같은 패키지 | 다른 패키지 (상속X) | 다른 패키지 (상속O) |
 | ----------- | ------ | ------ | ------------ | ------------ |
