@@ -13,7 +13,7 @@ import com.sinse.mall.domain.TopCategory;
 @Service
 public class TopCategoryServiceImpl implements TopCategoryService{
 	
-	@Qualifier("hibernateTopCategoryDAO")
+	@Qualifier("mybatisTopCategoryDAO")
 	@Autowired
 	TopCategoryDAO topCategoryDAO;
 	
