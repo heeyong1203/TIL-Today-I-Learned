@@ -14,7 +14,7 @@ import lombok.Data;
 public class SubCategory {
 	@Id
 	private int subcategory_id;
-	private String top_name;
+	private String sub_name;
 	
 	@ManyToOne
 	@JoinColumn(name="topcategory_id")

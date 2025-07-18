@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import com.sinse.mall.domain.TopCategory;
 
+@Qualifier("mybatisTopCategoryDAO")
 @Repository
 public class MybatisTopCategoryDAO implements TopCategoryDAO{
 	@Autowired

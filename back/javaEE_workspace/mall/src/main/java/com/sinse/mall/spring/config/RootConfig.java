@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration //xml 설정 파일 대신 .java로 쓰겠다.
 @EnableTransactionManagement
-@ComponentScan(basePackages = {"com.sinse.mall.model"})
+@ComponentScan(basePackages = {"com.sinse.mall.model", "com.sinse.mall.utill"})
 public class RootConfig {
 	
 	//어떤 데이터베이스를 사용할 지 선택
@@ -48,6 +48,7 @@ public class RootConfig {
 		//2) 어떠한 기술을 사용하더라도, 코드에 변함이 없다. (일관된 코드)
 		
 		//Mybatis에 사용할 트랜잭션매니저 선택
+		@Primary //여러 개의 트랜잭션 매니저 중 최우선 순위를 등록
 		@Bean
 		public PlatformTransactionManager platformTransactionManager(SqlSessionFactory sqlSessionFactory) {
 			return new DataSourceTransactionManager(sqlSessionFactory.getConfiguration().getEnvironment().getDataSource());
@@ -87,7 +88,6 @@ public class RootConfig {
 			return factoryBean;
 		}
 		
-		@Primary //여러 개의 트랜잭션 매니저 중 최우선 순위를 등록
 		@Bean //트랜잭션 매니저 등록
 		public  HibernateTransactionManager transactionManager(SessionFactory sessionFactory) {
 			return new HibernateTransactionManager(sessionFactory);
