@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration //xml 설정 파일 대신 .java로 쓰겠다.
 @EnableTransactionManagement
-@ComponentScan(basePackages = {"com.sinse.mall.model", "com.sinse.mall.utill"})
+@ComponentScan(basePackages = {"com.sinse.mall.model", "com.sinse.mall.util"})
 public class RootConfig {
 	
 	//어떤 데이터베이스를 사용할 지 선택

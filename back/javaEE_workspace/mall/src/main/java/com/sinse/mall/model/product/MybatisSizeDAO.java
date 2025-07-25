@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class MybatisSizeDAO implements SizeDAO{
+public class MybatisSizeDAO implements SizeDAO {
 	
 	@Autowired
 	private SqlSessionTemplate sqlSessionTemplate;

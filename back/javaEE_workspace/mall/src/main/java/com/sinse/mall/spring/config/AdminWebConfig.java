@@ -13,13 +13,15 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import com.sinse.mall.util.Paging;
+
 /*
   스프링의 고전적 설정을 담당하는 xml을 대신하는 Config.java
  */
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = {"com.sinse.mall.admin.controller"})
+@ComponentScan(basePackages = {"com.sinse.mall.admin.controller", "com.sinse.mall.util"})
 //@Controller, @Repsoitory, @Service, @Component
 public class AdminWebConfig extends WebMvcConfigurerAdapter{
 	
@@ -55,4 +57,11 @@ public class AdminWebConfig extends WebMvcConfigurerAdapter{
 		resolver.setMaxUploadSize(10*1024*1024); //10M
 		return resolver;
 	}
+	
+	/*
+	 * @Bean 
+	 * public Paging paging() { 
+	 * return new Paging(); 
+	 * }
+	 */
 }

@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sinse.mall.domain.SubCategory;
 
-@Qualifier("hibernateSubCategoryDAO")
 @Repository
+@Qualifier("hibernateSubCategoryDAO")
 public class HibernateSubCategoryDAO implements SubCategoryDAO {
 	
 	@Autowired
