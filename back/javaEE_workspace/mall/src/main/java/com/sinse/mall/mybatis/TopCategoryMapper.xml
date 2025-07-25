@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="TopCategory">
-	<sql id="query">
+	<sql id="columns">
 		select topcategory_id, top_name
 	</sql>
 	
-	<select id="selectAll" resultType="TopCategory">
-		<include refid="query"/> from topcategory
+	<resultMap type="TopCategory" id="subJoin">
+		<id 			column="topcategory_id"	property="topcategory_id" />
+		<result 	column="top_name" 		property="top_name" />
+		
+		<collection 
+			column="topcategory_id"	property="subList" javaType="java.util.List"
+			ofType="SubCategory"		select="SubCategory.selectByTopCategoryId" />
+	</resultMap>
+	
+	<select id="selectAll" resultMap="subJoin">
+		<include refid="columns"/> from topcategory
 	</select>
 	
 	<select id="select" parameterType="int" resultType="TopCategory">
-		<include refid="query"/> from topcategory where topcategory_id=#{topcategory_id}
+		<include refid="columns"/> from topcategory where topcategory_id=#{topcategory_id}
 	</select>
 	
 	<insert id="insert" parameterType="TopCategory">

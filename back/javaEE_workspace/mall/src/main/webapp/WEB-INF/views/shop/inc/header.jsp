@@ -1,4 +1,10 @@
+<%@page import="com.sinse.mall.domain.Member"%>
+<%@page import="com.sinse.mall.domain.TopCategory"%>
+<%@page import="java.util.List"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
+<%
+	List<TopCategory> topList=(List)request.getAttribute("topList");
+%>
     <header class="header">
         <div class="container-fluid">
             <div class="row">
@@ -31,8 +37,15 @@
                 <div class="col-lg-3">
                     <div class="header__right">
                         <div class="header__right__auth">
-                            <a href="#">Login</a>
-                            <a href="#">Register</a>
+                        	<%
+                        	Member loginMember = (Member)session.getAttribute("member"); 
+                        	%>
+                        	<%if(loginMember==null){ //로그인 하지 않은 경우.. %>
+                           	<a href="/shop/member/loginform">Login</a>
+                           	<a href="#">Register</a>
+                            <%} else{ %>
+                           	<a href="#"><%=loginMember.getName() %>님</a>
+                            <%} %>
                         </div>
                         <ul class="header__right__widget">
                             <li><span class="icon_search search-switch"></span></li>

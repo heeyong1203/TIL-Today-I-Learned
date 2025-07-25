@@ -6,6 +6,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import com.github.scribejava.apis.GoogleApi20;
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.oauth.OAuth20Service;
+
 /*
   스프링의 고전적 설정을 담당하는 xml을 대신하는 Config.java
  */
@@ -29,5 +33,16 @@ public class UserWebConfig {
 		resolver.setPrefix("/WEB-INF/views/");
 		resolver.setSuffix(".jsp");
 		return resolver;
+	}
+	
+	//google 로그인 관련 서비스 객체 등록
+	@Bean
+	public OAuth20Service googleAuthService() {
+		//클라이언트 ID, Secret, 리소스, Owner 콜백주소 접근 범위 등록
+		ServiceBuilder builder = new ServiceBuilder("1087480722732-d8mgrvk8kpeef6hhpjg8fgakc5ahgns3.apps.googleusercontent.com");
+		builder.apiSecret("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");
+		builder.defaultScope("email profile openid");
+		builder.callback("http://localhost:8888/shop/callback/sns/google");
+		return builder.build(GoogleApi20.instance());
 	}
 }

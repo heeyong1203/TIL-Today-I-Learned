@@ -1,4 +1,25 @@
+<%@page import="com.fasterxml.jackson.databind.ObjectMapper"%>
+<%@page import="com.sinse.mall.domain.ProductImg"%>
+<%@page import="com.sinse.mall.domain.Product"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
+<%
+	Product product = (Product)request.getAttribute("product");
+	
+	ObjectMapper mapper = new ObjectMapper();
+	
+	int[] colorArray = new int[product.getColorList().size()];
+	for(int i=0; i<colorArray.length; i++){
+		colorArray[i] = product.getColorList().get(i).getColor().getColor_id();
+	}
+	String colorJson = mapper.writeValueAsString(colorArray);
+	
+	int[] sizeArray = new int[product.getSizeList().size()];
+	for(int i=0; i<sizeArray.length; i++){
+		sizeArray[i] = product.getSizeList().get(i).getSize().getSize_id();
+	}
+	String sizeJson = mapper.writeValueAsString(sizeArray);
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,12 +53,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">상품 등록</h1>
+            <h1 class="m-0">상품 확인</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">상품관리>상품등록</li>
+              <li class="breadcrumb-item active">상품관리>상품확인</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -53,7 +74,7 @@
             <!-- 상품 등록 폼 시작 -->
             <div class="card card-primary">
               <div class="card-header">
-                <h3 class="card-title">상품 등록 폼</h3>
+                <h3 class="card-title">상품 내용 보기</h3>
               </div>
               <!-- /.card-header -->
               <!-- form start -->
@@ -79,19 +100,19 @@
 	                  </div>
                 	<!-- 카테고리 영역 끝 -->
                   <div class="form-group">
-                    <input type="text" class="form-control" name="product_name" placeholder="상품명 입력">
+                    <input type="text" class="form-control" name="product_name" value="<%=product.getProduct_name() %>">
                   </div>
                   <div class="form-group">
-                    <input type="text" class="form-control" name="brand" placeholder="브랜드 입력">
+                    <input type="text" class="form-control" name="brand" value="<%=product.getBrand()%>">
                   </div>
                   <div class="form-group">
-                    <input type="text" class="form-control" name="price" placeholder="가격 입력">
+                    <input type="text" class="form-control" name="price" value="<%=product.getPrice() %>">
                   </div>
                   <div class="form-group">
-                    <input type="text" class="form-control" name="discount" placeholder="할인가 입력">
+                    <input type="text" class="form-control" name="discount" value="<%=product.getDiscount() %>">
                   </div>
                   <div class="form-group">
-                    <input type="text" class="form-control" name="introduce" placeholder="간단소개 100자 이하 ">
+                    <input type="text" class="form-control" name="introduce" value="<%=product.getIntroduce() %>">
                   </div>
 				   <div class="form-group">
                        <select class="form-control" name ="color" id="color" multiple="multiple">
@@ -126,6 +147,7 @@
                     	</div>
                   
                 </div>
+                </div>
                 <!-- /.card-body -->
 
                 <div class="card-footer">
@@ -152,7 +174,7 @@
 	<%@ include file="../inc/footer_link.jsp" %>
 	<script src="/static/admin/custom/ProductImg.js"></script>
 	<script>
-	function printCategory(obj, list){
+	function printCategory(obj, list, v){
 		let tag="";
 		
 		if(obj=="#topcategory"){
@@ -178,53 +200,56 @@
 		}
 		
 		$(obj).html(tag); // innerHTML 태그와 동일하다.
+		
+		//현재 select 객체의 값 설정
+		$(obj).val(v);
 	}
 	
 	//비동기 방식으로 서버에 요청 시도하여, 데이터 가져오기
-	function getTopCategory(){
+	function getTopCategory(v){
 		$.ajax({
 			url:"/admin/admin/topcategory/list",
 			type:"get",
 			success: function(result, status, xhr){ //200번 대의 성공 응답 시, 이 함수 실행
-				console.log("서버로부터 받은 결과는 ", result);
+				console.log("서버로부터 받은 결과는 ", result, v);
 				//화면에 출력하기
-				printCategory("#topcategory", result);
+				printCategory("#topcategory", result, v);
 			},
 			error: function(xhr, status, err){
 			}
 		});
 	}
 	
-	function getSubCategory(topcategory_id){
+	function getSubCategory(topcategory_id, v){
 		$.ajax({
 			url:"/admin/admin/subcategory/list?topcategory_id="+topcategory_id,
 			type:"get",
 			success: function(result, status, xhr){ //200번 대의 성공 응답 시, 이 함수 실행
-				console.log("서버로부터 받은 결과는 ", result);
+				console.log("서버로부터 받은 결과는 ", result, v);
 				//화면에 출력하기
-				printCategory("#subcategory", result);
+				printCategory("#subcategory", result, v);
 			}
 		});
 	}
 	
-	function getColorList(){
+	function getColorList(v){
 		$.ajax({
 			url:"/admin/admin/color/list",
 			type:"get",
 			success: function(result, status, xhr){
-				console.log("서버로부터 받은 색상은 ", result);
-				printCategory("#color", result);
+				console.log("서버로부터 받은 색상은 ", result, v);
+				printCategory("#color", result, v);
 			}
 		});
 	}
 	
-	function getSizeList(){
+	function getSizeList(v){
 		$.ajax({
 			url:"/admin/admin/size/list",
 			type: "get",
 			success: function(result, status, xhr){
-				console.log("서버로부터 받은 사이즈는, ", result);
-				printCategory("#size", result);
+				console.log("서버로부터 받은 사이즈는, ", result, v);
+				printCategory("#size", result, v);
 			}
 		})	;
 	}
@@ -267,16 +292,61 @@
 		});
 	}
 	
+	//비동기 방식으로, 서버의 이미지를 다운로드 받기
+	function getImgList(dir, filename){
+		console.log("넘겨받은 파일명은 ", dir, "/", filename);
+		$.ajax({
+			url:"/data/" + dir + "/" + filename,
+			type:"GET",
+			/*
+			 	 서버로부터 가져온 이미지 정보는 img src로 표현되려면 다음 과정을 거쳐야 한다.
+			 	 1) 서버로부터 가져온 정보를 Blob 형태로 가져온다. Binary Large Object의 준말로 이미지, 오디오, 비디오, 일반 파일 등의 이진 데이터를 담을 수 있는 JS객체 자료형
+				 2) 웹브라우저 지원객체인 File로 변환한다.
+				 3) 이 파일을 읽어들인 후 e.target.result 형태로 img src에 대입한다.
+				 XMLHttpRequest객체를 이용한다...
+			*/
+			xhr: function(){
+				const xhr = new XMLHttpRequest();
+				xhr.responseType="blob"; //blob 형태의 데이터 요청
+				return xhr;
+			},
+			success: function(result, status, xhr){ //xhr가 blob형태로 요청하였기 때문에 tomcat은 binary형태로 정보를 넘겨준다.
+				console.log("서버로부터 받은 바이너리 정보는 " + result);
+				//2단계: 바이너리 서버로부터 전송받은 바이너리 데이터를 이용하여 File 객체로 만들자
+				const file = new File([result], filename, {type: result.type});
+				
+				selectedFile.push(file);
+			
+				//생성된 File을 읽어들여, img src속성에 대입!!
+				const reader = new FileReader();
+				reader.onload=function(e){
+					console.log("읽어들인 정보는 ", e);
+					
+					//container, file, src, width, height
+					let productImg = new ProductImg(document.getElementById("preview"), file, e.target.result, 100, 100	);
+				}
+				reader.readAsDataURL(file); //대상 파일 읽기
+				
+			}
+		})
+	}
+	
 	$(()=>{
 	   $('#summernote').summernote({
 			height:200,
-			placeholder:"상품 상세 설명을 채우세요"
    		});
+	   $('#summernote').summernote('code', '<%= product.getDetail() %>');
 	   
-	   getTopCategory(); //상위 카테고리 가져오기
-	   getColorList(); //색상 목록 가져오기
-	   getSizeList(); //사이즈 목록 가져오기
-	      
+	   getTopCategory(<%=product.getSubCategory().getTopcategory().getTopcategory_id()%>); //상위 카테고리 가져오기
+	   getSubCategory(<%=product.getSubCategory().getTopcategory().getTopcategory_id()%>, <%=product.getSubCategory().getSubcategory_id()%>); //하위 카테고리 가져오기
+	   getColorList(<%=colorJson%>); //색상 목록 가져오기
+	   getSizeList(<%=sizeJson%>); //사이즈 목록 가져오기
+	   
+	   //현재 우리가 가진 정보는 filename밖에 없으므로 실제 이미지를 onLoad 시점에 서버로 부터 다운로드 받자
+	   <%for(ProductImg productImg : product.getImgList()){%>
+	  		 getImgList("p_<%=product.getProduct_id()%>", "<%=productImg.getFilename()%>");
+       <%}%>
+       
 	   //상위 카테고리 값 변경 시, 하위 카테고리 가져오기
 	   $("#topcategory").change(function(){ //화살표함수 사용 시 바깥 영역인 Window 전역이 this가 되므로, 익명함수를 사용하였다.
 			getSubCategory($(this).val());

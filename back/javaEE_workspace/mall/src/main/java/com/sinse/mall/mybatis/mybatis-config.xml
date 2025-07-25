@@ -3,12 +3,17 @@
 
 <configuration>
 	<typeAliases>
-		<typeAlias type="com.sinse.mall.domain.Notice" alias="Notice"/>
-		<typeAlias type="com.sinse.mall.domain.TopCategory" alias="TopCategory"/>
-		<typeAlias type="com.sinse.mall.domain.SubCategory" alias="SubCategory"/>
-		<typeAlias type="com.sinse.mall.domain.Product" alias="Product"/>
-		<typeAlias type="com.sinse.mall.domain.Color" alias="Color"/>
-		<typeAlias type="com.sinse.mall.domain.Size" alias="Size"/>
+		<typeAlias type="com.sinse.mall.domain.Notice"			alias="Notice"/>
+		<typeAlias type="com.sinse.mall.domain.TopCategory" 	alias="TopCategory"/>
+		<typeAlias type="com.sinse.mall.domain.SubCategory" 	alias="SubCategory"/>
+		<typeAlias type="com.sinse.mall.domain.Product" 			alias="Product"/>
+		<typeAlias type="com.sinse.mall.domain.Color" 				alias="Color"/>
+		<typeAlias type="com.sinse.mall.domain.Size" 				alias="Size"/>
+		<typeAlias type="com.sinse.mall.domain.ProductColor" 	alias="ProductColor"/>
+		<typeAlias type="com.sinse.mall.domain.ProductSize" 	alias="ProductSize"/>
+		<typeAlias type="com.sinse.mall.domain.ProductImg" 	alias="ProductImg"/>
+		<typeAlias type="com.sinse.mall.domain.SnsProvider" 	alias="SnsProvider"/>
+		<typeAlias type="com.sinse.mall.domain.Member" 		alias="Member"/>
 	</typeAliases>
 	
 	<environments default="development">
@@ -26,5 +31,10 @@
 		<mapper resource="com/sinse/mall/mybatis/ProductMapper.xml" />
 		<mapper resource="com/sinse/mall/mybatis/ColorMapper.xml" />
 		<mapper resource="com/sinse/mall/mybatis/SizeMapper.xml" />
+		<mapper resource="com/sinse/mall/mybatis/ProductColorMapper.xml" />
+		<mapper resource="com/sinse/mall/mybatis/ProductSizeMapper.xml" />
+		<mapper resource="com/sinse/mall/mybatis/ProductImgMapper.xml" />
+		<mapper resource="com/sinse/mall/mybatis/SnsProviderMapper.xml" />
+		<mapper resource="com/sinse/mall/mybatis/MemberMapper.xml" />
 	</mappers>
 </configuration>
