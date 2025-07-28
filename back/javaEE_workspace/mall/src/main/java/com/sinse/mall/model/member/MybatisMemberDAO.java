@@ -14,12 +14,8 @@ public class MybatisMemberDAO implements MemberDAO {
 	private SqlSessionTemplate sqlSessionTemplate;
 	
 	@Override
-	public Member checkDuplicate(String id) throws MemberException{
-		Member member = (Member)sqlSessionTemplate.selectOne("Member.checkDuplicate", id);
-		if(member!=null) {
-			throw new MemberException("이미 존재하는 회원입니다.");
-		} 
-		return member;
+	public Member selectById(String id){
+		return sqlSessionTemplate.selectOne("Member.selectById", id);
 	}
 	
 	@Override

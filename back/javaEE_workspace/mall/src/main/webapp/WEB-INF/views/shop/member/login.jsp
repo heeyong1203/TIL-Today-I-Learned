@@ -189,6 +189,7 @@ input[type=submit]:hover {
 				url:"/shop/member/"+sns+"/authurl",
 				type:"get",
 				success:function(result, status, xhr){
+					alert(result);
 					location.href=result;
 				}
 			});

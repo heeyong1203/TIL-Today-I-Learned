@@ -6,8 +6,8 @@
 		member_id, sns_provider_id, id, password, name, email, regdate
 	</sql>
 	
-	<!-- 이미 존재하는 회원인지 조회 -->
-	<select id="checkDuplicate" parameterType="String" resultType="Member">
+	<!-- 아이디를 이용하여 회원정보 가져오기 -->
+	<select id="selectById" parameterType="String" resultType="Member">
 		select <include refid="columns"/> from Member where id=#{id} 
 	</select>
 	
