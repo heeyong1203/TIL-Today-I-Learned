@@ -483,8 +483,6 @@ ViewResolver → JSP 뷰 응답
 
 <<<<<<< Updated upstream
 ✔️ selectKey + 참조 관계로 insert 후 키 값 연동까지 해결
-=======
-✔️ selectKey + 참조 관계로 insert 후 키 값 연동까지 해결
 
 # 📘 57일차 수업 정리 (2025.07.15)
 
@@ -1380,4 +1378,16 @@ create table member(
   , constraint fk_sns_provider_member foreign key(sns_provider_id) references sns_provider(sns_provider_id)
 );
 ```
->>>>>>> Stashed changes
+
+#66일차 수업 정리(2025.07.28)
+
+1) 로그인 버튼 클릭
+네이버, 카카오, 구글
+
+2) login uri 추가 - member controller
+
+3) Oauth20Service가 구글에 대한 정보는 알아올 수 있으나, 네이버 등 타 sns의 경우 직접 만들어야 한다.
+
+4) class: NaverApi2
+
+"https://openapi.naver.com/v1/nid/me"
