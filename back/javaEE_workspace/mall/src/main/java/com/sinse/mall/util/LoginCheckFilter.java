@@ -38,9 +38,14 @@ public class LoginCheckFilter implements Filter {
 		if(//그냥 가도록 허용하고 싶은 uri
 			uri.equals("/shop/main") ||
 			
-			//로그인 폼 & 로그아웃
+			//로그인 폼 & 로그인 & 로그아웃
 			uri.equals("/shop/member/loginform") ||
+			uri.equals("/shop/member/login") ||
 			uri.equals("/shop/member/logout") ||
+			
+			//회원가입 및 폼
+			uri.equals("/shop/member/registform") ||
+			uri.equals("/shop/member/regist") ||
 			
 			//콜백 & 동의화면 관련
 			uri.startsWith("/shop/callback/sns") ||
@@ -48,7 +53,10 @@ public class LoginCheckFilter implements Filter {
 			
 			//상품 관련
 			uri.equals("/shop/product/list") ||
-			uri.startsWith("/shop/product/detail")
+			uri.startsWith("/shop/product/detail") ||
+			
+			//에러 페이지 관련
+			uri.equals("/shop/error/result")
 		) {
 			chain.doFilter(req, res);
 

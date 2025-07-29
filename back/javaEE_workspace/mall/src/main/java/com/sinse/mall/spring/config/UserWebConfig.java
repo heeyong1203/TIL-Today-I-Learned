@@ -18,7 +18,7 @@ import com.sinse.mall.model.member.NaverApi20;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = {"com.sinse.mall.shop.controller"})
+@ComponentScan(basePackages = {"com.sinse.mall.advice", "com.sinse.mall.shop.controller"})
 public class UserWebConfig {
 	
 	/*하위 컨트롤러가 3, 4단계를 수행한 후, DispatcherServlet에게 정확한 파일명이 아닌
@@ -42,7 +42,7 @@ public class UserWebConfig {
 	public OAuth20Service googleAuthService() {
 		//클라이언트 ID, Secret, 리소스, Owner 콜백주소 접근 범위 등록
 		ServiceBuilder builder = new ServiceBuilder("1087480722732-d8mgrvk8kpeef6hhpjg8fgakc5ahgns3.apps.googleusercontent.com"); 
-		builder.apiSecret(""); //바꾸어야 함
+		builder.apiSecret("");
 		builder.defaultScope("email profile openid");
 		builder.callback("http://localhost:8888/shop/callback/sns/google");
 		return builder.build(GoogleApi20.instance());

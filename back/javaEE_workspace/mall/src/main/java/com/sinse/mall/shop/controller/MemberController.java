@@ -7,9 +7,12 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.model.OAuthRequest;
@@ -19,6 +22,9 @@ import com.github.scribejava.core.oauth.OAuth20Service;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sinse.mall.domain.Member;
+import com.sinse.mall.exception.MemberException;
+import com.sinse.mall.exception.MemberNotFoundException;
+import com.sinse.mall.exception.PasswordEncryptException;
 import com.sinse.mall.model.member.MemberService;
 import com.sinse.mall.model.member.SnsProviderService;
 
@@ -54,6 +60,33 @@ public class MemberController {
 	public String logout(HttpSession session) {
 		//세션을 제거할 수는 없다. 단 세션을 무효화시킬 수 있다.
 		session.invalidate(); //현재 사용중인 세션 무효화 따라서 이 시점부터 기존 세션을 참조할 수 없다.
+		return "redirect:/shop/main";
+	}
+	
+	//회원가입폼 요청처리
+	@GetMapping("/member/registform")
+	public String registform() {
+		return "shop/member/join";
+	}
+	
+	//회원가입 요청처리
+	@PostMapping("/member/regist")
+	public String regist(Member member) {
+		log.debug("ID " + member.getId());
+		log.debug("Password " + member.getPassword());
+		log.debug("eamil " + member.getEmail());
+		log.debug("name " + member.getName());
+		
+		memberService.regist(member);
+		
+		return "redirect:/shop/member/loginform";
+	}
+	
+	//홈페이지 로그인 요청처리
+	@PostMapping("/member/login")
+	public String login(Member member, HttpSession session) {
+		Member loginSuccessMember = memberService.login(member);
+		session.setAttribute("member", loginSuccessMember);
 		return "redirect:/shop/main";
 	}
 	
@@ -211,4 +244,28 @@ public class MemberController {
 		
 		return null;
 	}
+	
+	//현재 컨트롤러들에서 발생하는 예외에 대한 처리
+	@ExceptionHandler(PasswordEncryptException.class)
+	public ModelAndView handle(PasswordEncryptException e) {
+		ModelAndView mav = new ModelAndView("/shop/error/result");
+		//mav.addObject("e", e);
+		log.error("암호화에 문제가 생겼습니다.");
+		e.printStackTrace();
+		
+		mav.addObject("msg", "회원가입에 실패하였습니다.");
+		
+		return mav;
+	}
+	
+	//현재 컨트롤러들에서 발생하는 예외에 대한 처리
+	@ExceptionHandler({MemberException.class, MemberNotFoundException.class})
+	public ModelAndView handle(Exception e) {
+		ModelAndView mav = new ModelAndView("/shop/error/result");
+		e.printStackTrace();
+		mav.addObject("msg", e.getMessage());
+		
+		return mav;
+	}
+	
 }

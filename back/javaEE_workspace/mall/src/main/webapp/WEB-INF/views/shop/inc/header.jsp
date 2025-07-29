@@ -42,7 +42,7 @@
                         	%>
                         	<%if(loginMember==null){ //로그인 하지 않은 경우.. %>
                            	<a href="/shop/member/loginform">Login</a>
-                           	<a href="#">Register</a>
+                           	<a href="/shop/member/registform">Register</a>
                             <%} else{ %>
                            	<a href="#"><%=loginMember.getName() %>님</a><a href="/shop/member/logout">logout</a>
                             <%} %>
