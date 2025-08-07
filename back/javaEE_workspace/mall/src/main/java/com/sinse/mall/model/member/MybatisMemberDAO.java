@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import com.sinse.mall.domain.Member;
 import com.sinse.mall.exception.MemberException;
+import com.sinse.mall.exception.MemberNotFoundException;
 
 @Repository
 public class MybatisMemberDAO implements MemberDAO {
@@ -14,12 +15,8 @@ public class MybatisMemberDAO implements MemberDAO {
 	private SqlSessionTemplate sqlSessionTemplate;
 	
 	@Override
-	public Member checkDuplicate(String id) throws MemberException{
-		Member member = (Member)sqlSessionTemplate.selectOne("Member.checkDuplicate", id);
-		if(member!=null) {
-			throw new MemberException("이미 존재하는 회원입니다.");
-		} 
-		return member;
+	public Member selectById(String id){
+		return sqlSessionTemplate.selectOne("Member.selectById", id);
 	}
 	
 	@Override
@@ -28,5 +25,23 @@ public class MybatisMemberDAO implements MemberDAO {
 		if(result<1) {
 			throw new MemberException("회원 등록 실패");
 		}
+	}
+	
+	@Override
+	public Member selectByEmail(String email) throws MemberException {
+		Member member = sqlSessionTemplate.selectOne("Member.selectByEmail", email);
+		if(member==null) {
+			throw new MemberException("입력하신 정보와 일치하는 회원이 없습니다.");
+		}
+		return member;
+	}
+	
+	@Override
+	public Member login(Member member) throws MemberNotFoundException {
+		Member logginedMember = sqlSessionTemplate.selectOne("Member.login",member);
+		if(logginedMember==null) {
+			throw new MemberNotFoundException("로그인 정보가 올바르지 않습니다.");
+		}
+		return logginedMember;
 	}
 }

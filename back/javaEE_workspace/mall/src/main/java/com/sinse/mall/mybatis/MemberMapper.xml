@@ -3,18 +3,28 @@
 <mapper namespace="Member">
 	
 	<sql id="columns">
-		member_id, sns_provider_id, id, password, name, email, regdate
+		member_id, sns_provider_id, id, salt, password, name, email, regdate
 	</sql>
 	
-	<!-- 이미 존재하는 회원인지 조회 -->
-	<select id="checkDuplicate" parameterType="String" resultType="Member">
+	<!-- 아이디를 이용하여 회원정보 가져오기 -->
+	<select id="selectById" parameterType="String" resultType="Member">
 		select <include refid="columns"/> from Member where id=#{id} 
 	</select>
 	
 	<!-- 가입 -->
 	<insert id="insert" parameterType="Member">
-		insert into member(sns_provider_id, id, password, name, email)
-		values(#{snsProvider.sns_provider_id}, #{id}, #{password}, #{name}, #{email})
+		insert into member(sns_provider_id, id, password, salt, name, email)
+		values(#{snsProvider.sns_provider_id}, #{id}, #{password}, #{salt}, #{name}, #{email})
 	</insert>
+	
+	<!-- 이메일을 이용한 회원정보 가져오기 (salt 정보를 가져와 로그인을 허용하기 위함) -->
+	<select id="selectByEmail" parameterType="String" resultType="Member">
+		select <include refid="columns"/> from member where email=#{email}
+	</select>
+	
+	<!-- 이메일을 이용한 회원정보를 통해 로그인하기 -->
+	<select id="login" parameterType="Member" resultType="Member">
+		select <include refid="columns"/> from member where email=#{email} and password=#{password}
+	</select>
 	
 </mapper>

@@ -58,13 +58,13 @@ input:hover, .btn:hover {
 }
 
 /* style the submit button */
-input[type=submit] {
+input[type=button] {
 	background-color: #04AA6D;
 	color: white;
 	cursor: pointer;
 }
 
-input[type=submit]:hover {
+input[type=button]:hover {
 	background-color: #45a049;
 }
 
@@ -142,7 +142,7 @@ input[type=submit]:hover {
 		each other instead of next to each other.</p>
 
 	<div class="container">
-		<form action="/action_page.php">
+		<form id="form2">
 			<div class="row">
 				<h2 style="text-align: center">Login with Social Media or
 					Manually</h2>
@@ -161,9 +161,10 @@ input[type=submit]:hover {
 						<p>Or sign in manually:</p>
 					</div>
 
-					<input type="text" name="username" placeholder="Username" required>
-					<input type="password" name="password" placeholder="Password"
-						required> <input type="submit" value="Login">
+					<input type="text" 			name="email" 			placeholder="email" 		required>
+					<input type="password" 	name="password" 	placeholder="Password" 	required> 
+					<input type="button" 		value="Login" 			id="bt_login">
+					
 				</div>
 
 			</div>
@@ -189,10 +190,25 @@ input[type=submit]:hover {
 				url:"/shop/member/"+sns+"/authurl",
 				type:"get",
 				success:function(result, status, xhr){
+					alert(result);
 					location.href=result;
 				}
 			});
 		}
+		
+		function homeLogin(){
+			$("#form2").attr({
+				action:"/shop/member/login",
+				method:"post"
+			});
+			$("#form2").submit();
+		}
+		
+		$(()=>{
+			$("#bt_login").click(()=>{
+				homeLogin();
+			});
+		});
 	</script>
 	
 </body>
