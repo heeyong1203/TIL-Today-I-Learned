@@ -34,10 +34,10 @@
 | 분야        | 사용 기술 |
 |-------------|------------|
 | 프론트엔드  | HTML, CSS, JavaScript, JSP |
-| 백엔드      | Java (JDK 17 기준) |
+| 백엔드      | Java (JDK 1.8 / JDK21 기준) |
 | 데이터베이스 | MySQL, Oracle |
-| 서버        | Apache Tomcat 9 |
-| 협업/도구    | Git, GitHub, Figma, DBeaver, ERD Cloud |
+| 서버        | Apache Tomcat 8.5 |
+| 협업/도구    |Git, GitHub, Figma, DBeaver, ERD Cloud |
 
 ---
 
