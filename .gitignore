@@ -1,16 +1,20 @@
-# Compiled class file
+# ======================
+# Java (공통)
+# ======================
 *.class
-
-# Log file
 *.log
-
-# BlueJ files
+*.tmp
+*.bak
 *.ctxt
-
-# Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
+#Java 가상머신
+hs_err_pid*
+replay_pid*
+
+# ======================
+# 패키징/아카이브 파일
+# ======================
 *.jar
 *.war
 *.nar
@@ -19,50 +23,94 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
-
-#이클립스 
-.metadata
-.settings/
-.classpath
-*.project
-.factorypath
-
-# Maven build
+# ======================
+# 빌드 결과물
+# ======================
+build/
+bin/
+out/
 target/
-
-# Tomcat config
 Servers/
 
-# Eclipse IDE 설정 캐시 제외
+# ======================
+# IDE 설정
+# ======================
+# Eclipse
+.settings/
+.classpath
+.project
+.factorypath
 .metadata/
 
-# 빌드 결과물
-bin/
-build/
-out/
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+.idea_modules/
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+.idea/**/aws.xml
+.idea/**/contentModel.xml
+.idea/**/dataSources*
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
+.idea/**/gradle.xml
+.idea/**/libraries
+.idea/**/sonarlint/
+.idea/**/sonarIssues.xml
+.idea/**/markdown-navigator*
+.idea/**/mongoSettings.xml
+.idea/**/httpRequests
+.idea/codestream.xml
+.idea/**/azureSettings.xml
+.idea/caches/
 
-# 운영체제별 파일
+# 공유 가능한 IntelliJ 설정 제외
+!.idea/codeStyles
+!.idea/runConfigurations
+
+# ======================
+# 운영체제 파일
+# ======================
 .DS_Store
 Thumbs.db
 
-# 환경설정 파일
-*.iml
+# ======================
+# Gradle
+# ======================
+.gradle/
+gradle-app.setting
 
-# 기타 임시 파일
-*.tmp
-*.bak
-
-# IntelliJ IDEA
-.idea/
-*.iws
-*.ipr
-
+# ======================
 # VSCode
+# ======================
 .vscode/
 
-# 기타
+# ======================
+# Node.js (프론트엔드 포함 시)
+# ======================
 node_modules/
 dist/
+.env
+
+# ======================
+# 프로젝트 별 명시적 제외 (Spring Boot 기준)
+# ======================
+back/boot_workspace/RESTApp/build/
+back/boot_workspace/RESTApp/out/
+back/boot_workspace/RESTApp/.idea/
+back/boot_workspace/RESTApp/.gradle/
+back/boot_workspace/RESTApp/*.iml
+back/boot_workspace/RESTApp/*.log
+back/boot_workspace/RESTApp/.DS_Store
+back/boot_workspace/RESTApp/*.tmp
+
+# Vue 프로젝트
+front/vue_workspace/node_modules/
+front/vue_workspace/dist/
+front/vue_workspace/.env
