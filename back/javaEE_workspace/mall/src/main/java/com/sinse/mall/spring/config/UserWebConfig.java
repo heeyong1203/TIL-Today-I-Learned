@@ -42,7 +42,7 @@ public class UserWebConfig {
 	public OAuth20Service googleAuthService() {
 		//클라이언트 ID, Secret, 리소스, Owner 콜백주소 접근 범위 등록
 		ServiceBuilder builder = new ServiceBuilder("1087480722732-d8mgrvk8kpeef6hhpjg8fgakc5ahgns3.apps.googleusercontent.com"); 
-		builder.apiSecret("");
+		builder.apiSecret("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");
 		builder.defaultScope("email profile openid");
 		builder.callback("http://localhost:8888/shop/callback/sns/google");
 		return builder.build(GoogleApi20.instance());
@@ -53,7 +53,7 @@ public class UserWebConfig {
 	public OAuth20Service naverAuthService() {
 		//클라이언트 ID, Secret, 리소스, Owner 콜백주소 접근 범위 등록
 		ServiceBuilder builder = new ServiceBuilder("wYVvvLJuGi572wwBSpyj"); //id가 naverAuthService에 심어진다.
-		builder.apiSecret(""); //secret이 naverAuthService에 심어진다.
+		builder.apiSecret("od4C2be8Gn"); //secret이 naverAuthService에 심어진다.
 		builder.defaultScope("name email");
 		builder.callback("http://localhost:8888/shop/callback/sns/naver");
 		return builder.build(NaverApi20.instance());
@@ -64,7 +64,7 @@ public class UserWebConfig {
 	public OAuth20Service kakaoAuthService() {
 		//클라이언트 ID, Secret, 리소스, Owner 콜백주소 접근 범위 등록
 		ServiceBuilder builder = new ServiceBuilder("4dbad52140883e284aaf5e1ef4992f97"); //REST API의 id가 naverAuthService에 심어진다.
-		builder.apiSecret(""); //secret이 naverAuthService에 심어진다.
+		builder.apiSecret("EpBWMAAlxta7GSqSdzUFY8zU0gjCrbLE"); //secret이 naverAuthService에 심어진다.
 		builder.defaultScope("profile_nickname profile_image");
 		builder.callback("http://localhost:8888/shop/callback/sns/kakao");
 		return builder.build(KakaoApi20.instance());

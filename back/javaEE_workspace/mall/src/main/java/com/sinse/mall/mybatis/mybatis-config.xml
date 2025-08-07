@@ -14,6 +14,7 @@
 		<typeAlias type="com.sinse.mall.domain.ProductImg" 	alias="ProductImg"/>
 		<typeAlias type="com.sinse.mall.domain.SnsProvider" 	alias="SnsProvider"/>
 		<typeAlias type="com.sinse.mall.domain.Member" 		alias="Member"/>
+		<typeAlias type="com.sinse.mall.domain.Cart" 				alias="Cart"/>
 	</typeAliases>
 	
 	<environments default="development">
@@ -36,5 +37,6 @@
 		<mapper resource="com/sinse/mall/mybatis/ProductImgMapper.xml" />
 		<mapper resource="com/sinse/mall/mybatis/SnsProviderMapper.xml" />
 		<mapper resource="com/sinse/mall/mybatis/MemberMapper.xml" />
+		<mapper resource="com/sinse/mall/mybatis/CartMapper.xml" />
 	</mappers>
 </configuration>
