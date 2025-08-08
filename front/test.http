@@ -1,0 +1,31 @@
+###게시물 목록
+GET http://localhost:9999/shop/boards
+Content-Type: application/json
+
+###게시물 등록
+POST http://localhost:9999/shop/boards
+Content-Type: application/json
+
+{
+    "title" : "게시판 등록 테스트",
+    "writer" : "Heeyong",
+    "content" : "내용 없음"
+}
+
+###게시물 한 건 조회
+GET  http://localhost:9999/shop/boards/2
+Content-Type: application/json
+
+###게시물 한 건 수정
+PUT  http://localhost:9999/shop/boards/2
+Content-Type: application/json
+
+{
+    "title" : "게시판 수정 테스트",
+    "writer" : "Heeyong",
+    "content" : "mybatis로 내용 수정하였음"
+}
+
+###게시물 한 건 삭제
+DELETE http://localhost:9999/shop/boards/5
+Content-Type: application/json
