@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        #app{
+            width: 1400px;
+            height: 800px;
+            display: flex;
+            flex-direction: column;
+        }
+        #content_header{
+            width: 100%;
+            height: 50px;
+            background-color: #C8FFFF;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        #content_header input{
+            height: 30px;
+            align-self: center;
+        }
+        #content_header input[type='text']{
+            width: 400px;
+        }
+        #content_body{
+            width: 100%;
+            height: 750px;
+            background-color: rgb(53, 182, 180);
+            display: flex;
+            justify-content: center;
+            white-space: pre-wrap;
+        }
+        table {
+            table-layout: fixed;  /* 테이블 칸 너비 고정 */
+            width: 100%;          /* 테이블 너비 꽉 채우기 */
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="content_header">
+            <input type="text" placeholder="관광지를 입력하세요." />
+            <input type="button" value="검색" />
+        </div>
+        <div id="content_body">
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>관광지명</th>
+                        <th>도로명주소</th>
+                        <!--<th>위도</th>-->
+                        <!--<th>경도</th>-->
+                        <th>편의시설</th>
+                        <th>숙박시설</th>
+                        <th>자연경관</th>
+                        <th>휴양시설</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in tourList" :key="item.tourNo">
+                        <td>{{ item.tourNm }}</td>
+                        <td>{{ item.newAddr }}</td>
+                        <!--<td>{{ item.latitude }}</td>-->
+                        <!--<td>{{ item.longtitude }}</td>-->
+                        <td>{{ item.convenienceFacility }}</td>
+                        <td>{{ item.accommodations }}</td>
+                        <td>{{ item.amusementFacility }}</td>
+                        <td>{{ item.recreationalFacility }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        const {createApp, reactive, ref} = Vue;
+
+        createApp({
+            setup(){
+                let msg=ref("apple");
+                const tourList = reactive([]);
+
+                const getList=(tourNm)=>{
+                    
+                    tourNm = (tourNm==undefined) ? "" : tourNm;
+                    
+                    $.ajax({
+                        url:"http://localhost:8989/tour/getTourList?tourNm="+tourNm,
+                        method:"GET",
+                        dataType: "json",
+                        success:(result, status, xhr)=>{
+                            console.log(result);
+                            tourList.splice(0);
+                            result.data.forEach((item) => {
+                                tourList.push(item);
+                            });
+                        }
+                    });
+                }
+
+                getList("");
+                
+                return {msg, getList, tourList};
+            }
+        }).mount("#app");
+    </script>
+</body>
+</html>
